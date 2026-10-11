@@ -52,6 +52,7 @@ export const channelNames = [
   'account:logout',
   'account:setSmtpPassword',
   'account:testSmtp',
+  'account:outlookAccounts',
   'send:checks',
   'send:single',
   'send:test',

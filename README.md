@@ -76,6 +76,17 @@ Ordinea de prioritate: variabila de mediu → ID-ul salvat din Setări → ID-ul
 
 La „Conectează Outlook”, aplicația deschide browserul sistemului cu pagina de login Microsoft. După autentificare, Microsoft redirecționează spre `http://localhost:<port>`, iar MSAL preia codul și obține tokenurile. Cache-ul de tokenuri e salvat **criptat** cu `safeStorage` (Keychain pe macOS, DPAPI pe Windows, libsecret pe Linux) în `auth-cache.bin`. La pornire, contul se reconectează silențios. Dacă sesiunea expiră, aplicația afișează „Sesiunea Microsoft a expirat — Reconectează”. Pe Linux fără keyring, tokenurile nu se salvează pe disc, așa că va trebui să te reconectezi după fiecare repornire.
 
+### Trimitere prin Outlook instalat (Windows, fără Azure)
+
+Pe Windows, dacă ai **Outlook clasic** instalat și conectat, alege **Setări → Cont de email → Outlook instalat**. Aplicația comandă Outlook prin COM, cu un script PowerShell inclus. Emailurile pleacă din contul deja conectat în Outlook, fără înregistrare în Azure, și apar în „Trimise” din Outlook. Dacă Outlook are mai multe conturi, alegi din care se trimite. Merge și la trimiterea în masă, cu aceeași coadă (pauză, reluare, fără dubluri).
+
+Limitări:
+
+- funcționează doar cu Outlook **clasic** pe Windows; „noul Outlook” și Outlook pentru Mac nu permit acest tip de automatizare;
+- Outlook poate afișa „Un program încearcă să trimită email în numele tău” (de obicei când antivirusul nu e recunoscut ca actualizat); alege _Permite_, altfel trimiterea se oprește și poate fi reluată;
+- emailurile trec prin „Outbox”; dacă Outlook lucrează offline, pleacă la reconectare;
+- verificarea după o întrerupere caută mesajul în „Trimise”/„Outbox” după un antet `X-LeadMailer-Send-Id`; dacă nu-l găsește, rândul e marcat „De verificat”.
+
 ### Alternativa SMTP
 
 Dacă nu poți înregistra aplicația, alege **Setări → Cont de email → Server SMTP**. Merge cu serverul de email al firmei sau cu Gmail cu parolă de aplicație. Parola se păstrează criptată local. Ai și un buton „Testează conexiunea”. Atenție:

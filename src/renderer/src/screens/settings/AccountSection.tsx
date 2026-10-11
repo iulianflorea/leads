@@ -9,6 +9,8 @@ import { t } from '@renderer/lib/i18n'
 import { confirm } from '@renderer/components/Confirm'
 import { Button, Field, Segmented, Switch } from '@renderer/components/ui'
 import { ClientIdForm, ClientIdSummary } from './ClientIdForm'
+import { OutlookSection } from './OutlookSection'
+import { platform } from '@renderer/lib/platform'
 
 function MicrosoftAccount(): ReactNode {
   const { status, connecting, login, logout } = useAccount()
@@ -203,12 +205,17 @@ export function AccountSection(): ReactNode {
           onChange={(mailProvider) => void update({ mailProvider })}
           options={[
             { value: 'graph', label: t('account.methodGraph') },
+            // Classic Outlook automation only exists on Windows.
+            ...(platform === 'win32' || settings.mailProvider === 'outlook'
+              ? [{ value: 'outlook' as const, label: t('account.methodOutlook') }]
+              : []),
             { value: 'smtp', label: t('account.methodSmtp') },
             { value: 'mock', label: t('account.methodMock') },
           ]}
         />
       </div>
       {settings.mailProvider === 'graph' && <MicrosoftAccount />}
+      {settings.mailProvider === 'outlook' && <OutlookSection />}
       {settings.mailProvider === 'smtp' && <SmtpForm />}
       {settings.mailProvider === 'mock' && (
         <div className="callout">

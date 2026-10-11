@@ -4,7 +4,7 @@ import { DEFAULT_SEND_INTERVAL_SECONDS, isValidClientId } from '../config'
 export const themeSchema = z.enum(['system', 'light', 'dark'])
 export type Theme = z.infer<typeof themeSchema>
 
-export const mailProviderKindSchema = z.enum(['graph', 'smtp', 'mock'])
+export const mailProviderKindSchema = z.enum(['graph', 'outlook', 'smtp', 'mock'])
 export type MailProviderKind = z.infer<typeof mailProviderKindSchema>
 
 const smtpFields = {
@@ -40,6 +40,8 @@ const settingsFields = {
   unsubscribeHtml: z.string().max(5_000),
   onboardingDone: z.boolean(),
   /** Microsoft Entra application (client) ID entered in the app; empty = not set. */
+  /** Classic Outlook account (SMTP address) to send from; empty = Outlook's default. */
+  outlookAccount: z.string().trim().max(320),
   msClientId: z
     .string()
     .trim()
@@ -57,6 +59,7 @@ export const settingsSchema = z.object({
   unsubscribeHtml: settingsFields.unsubscribeHtml.default(DEFAULT_UNSUBSCRIBE_HTML),
   onboardingDone: settingsFields.onboardingDone.default(false),
   msClientId: settingsFields.msClientId.default(''),
+  outlookAccount: settingsFields.outlookAccount.default(''),
 })
 export type Settings = z.infer<typeof settingsSchema>
 

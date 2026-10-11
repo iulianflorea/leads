@@ -17,4 +17,9 @@ export interface AccountStatus {
   clientIdSource: ClientIdSource
 }
 
+export interface OutlookAccount {
+  email: string
+  name: string
+}
+
 export type ClientIdSource = 'env' | 'settings' | 'build' | 'code' | 'none'

@@ -9,6 +9,8 @@ import { secureStore } from '../auth/secure-store'
 import { GraphMailProvider } from './graph'
 import { SmtpMailProvider } from './smtp'
 import { MockMailProvider } from './mock'
+import { OutlookDesktopProvider, powershellRunner } from './outlook'
+import type { OutlookAccount } from '@shared/schemas/mail'
 import type { MailProvider } from './types'
 
 const SMTP_PASSWORD_KEY = 'secret.smtpPassword'
@@ -19,6 +21,7 @@ export class MailService {
   private readonly graph: GraphMailProvider
   private readonly smtp: SmtpMailProvider
   private readonly mock: MockMailProvider
+  private readonly outlook: OutlookDesktopProvider
   /** Fallback when the OS keychain is unavailable: kept for this session only. */
   private sessionSmtpPassword: string | null = null
 
@@ -37,6 +40,10 @@ export class MailService {
       () => this.smtpPassword(),
     )
     this.mock = new MockMailProvider(() => join(dataDir(), 'mock-outbox'))
+    this.outlook = new OutlookDesktopProvider(
+      powershellRunner(dataDir),
+      () => this.settings.get().outlookAccount,
+    )
   }
 
   /** LEADMAILER_MAIL_PROVIDER overrides the setting (used by tests and demos). */
@@ -47,13 +54,21 @@ export class MailService {
 
   provider(): MailProvider {
     const kind = this.kind()
-    return kind === 'graph' ? this.graph : kind === 'smtp' ? this.smtp : this.mock
+    if (kind === 'graph') return this.graph
+    if (kind === 'outlook') return this.outlook
+    return kind === 'smtp' ? this.smtp : this.mock
   }
 
   async status(): Promise<AccountStatus> {
     const kind = this.kind()
     const configured =
-      kind === 'graph' ? this.microsoft.configured : kind === 'smtp' ? this.smtp.configured : true
+      kind === 'graph'
+        ? this.microsoft.configured
+        : kind === 'smtp'
+          ? this.smtp.configured
+          : kind === 'outlook'
+            ? this.outlook.supported
+            : true
     const account = configured
       ? await this.provider()
           .getAccount()
@@ -82,9 +97,16 @@ export class MailService {
   async requireAccount(): Promise<void> {
     const status = await this.status()
     if (!status.configured) {
-      throw new AppError(status.provider === 'smtp' ? 'smtpNotConfigured' : 'authNotConfigured')
+      throw new AppError(
+        status.provider === 'smtp'
+          ? 'smtpNotConfigured'
+          : status.provider === 'outlook'
+            ? 'outlookUnavailable'
+            : 'authNotConfigured',
+      )
     }
-    if (!status.account) throw new AppError('authRequired')
+    if (!status.account)
+      throw new AppError(status.provider === 'outlook' ? 'outlookUnavailable' : 'authRequired')
   }
 
   smtpPassword(): string | null {
@@ -110,7 +132,13 @@ export class MailService {
     await this.smtp.verify()
   }
 
+  /** Accounts configured in classic Outlook on this computer (refreshes the cache). */
+  async outlookAccounts(): Promise<OutlookAccount[]> {
+    return this.outlook.accounts(true)
+  }
+
   onSettingsChanged(): void {
+    this.outlook.reset()
     this.microsoft.syncClientId()
     this.smtp.reset()
   }

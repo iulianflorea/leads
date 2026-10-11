@@ -54,7 +54,7 @@ setErrorActionResolver((code) => {
   if (code === 'authExpired' || code === 'authRequired') {
     return { label: t('actions.reconnect'), run: () => void useAccount.getState().login() }
   }
-  if (code === 'authNotConfigured' || code.startsWith('smtp')) {
+  if (code === 'authNotConfigured' || code.startsWith('smtp') || code === 'outlookUnavailable') {
     return {
       label: t('actions.openSettings'),
       run: () => useNav.getState().go('settings', { section: 'account' }),

@@ -1,6 +1,15 @@
 import { type ReactNode, useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Check, FileSpreadsheet, FlaskConical, Mail, Send, Server, UserRound } from 'lucide-react'
+import {
+  Check,
+  FileSpreadsheet,
+  FlaskConical,
+  Mail,
+  MonitorSmartphone,
+  Send,
+  Server,
+  UserRound,
+} from 'lucide-react'
 import { APP_NAME } from '@shared/config'
 import { useOnboarding } from '@renderer/stores/onboarding'
 import { useAccount } from '@renderer/stores/account'
@@ -12,7 +21,7 @@ import { useNav } from '@renderer/stores/nav'
 import { toast } from '@renderer/stores/toast'
 import { call } from '@renderer/lib/api'
 import { t, tp } from '@renderer/lib/i18n'
-import { cx } from '@renderer/lib/platform'
+import { cx, platform } from '@renderer/lib/platform'
 import { useFocusTrap } from '@renderer/components/Modal'
 import { Button } from '@renderer/components/ui'
 import { ClientIdForm } from '../settings/ClientIdForm'
@@ -56,6 +65,19 @@ function AccountStep({ next }: { next(): void }): ReactNode {
       )}
       {status?.provider === 'graph' && !status.configured && <ClientIdForm compact />}
       <div className="onb-alt">
+        {platform === 'win32' && (
+          <Button
+            variant={status?.provider === 'graph' && status.configured ? 'secondary' : 'primary'}
+            icon={<MonitorSmartphone size={14} />}
+            onClick={() => {
+              void update({ mailProvider: 'outlook' })
+              hide()
+              go('settings', { section: 'account' })
+            }}
+          >
+            {t('onboarding.useOutlookDesktop')}
+          </Button>
+        )}
         <Button
           icon={<Server size={14} />}
           onClick={() => {

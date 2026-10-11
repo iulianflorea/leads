@@ -22,6 +22,7 @@ export function sendHandlers(ctx: AppContext): Partial<Handlers> {
       await announce()
     },
     'account:testSmtp': () => ctx.mail.testSmtp(),
+    'account:outlookAccounts': () => ctx.mail.outlookAccounts(),
     'send:checks': ({ leadId, templateId }) => ctx.sender.checks(leadId, templateId),
     'send:single': ({ leadId, templateId }) => ctx.sender.sendSingle(leadId, templateId),
     'send:test': ({ source, leadId }) => ctx.sender.sendTest(source, leadId),

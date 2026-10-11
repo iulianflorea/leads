@@ -36,7 +36,7 @@ import {
   type EmailPreview,
   type Template,
 } from './schemas/template'
-import type { AccountStatus } from './schemas/mail'
+import type { AccountStatus, OutlookAccount } from './schemas/mail'
 import {
   bulkPrepareSchema,
   bulkStartSchema,
@@ -123,6 +123,7 @@ export const ipcContract = {
     z.object({ password: z.string().max(1000).nullable() }),
   ),
   'account:testSmtp': channel<void>()(none),
+  'account:outlookAccounts': channel<OutlookAccount[]>()(none),
 
   'send:checks': channel<LeadSendChecks>()(sendSingleSchema),
   'send:single': channel<SendOutcome>()(sendSingleSchema),

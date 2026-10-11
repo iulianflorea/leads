@@ -17,6 +17,8 @@ export const ACCOUNT_ERRORS = new Set([
   'smtpNotConfigured',
   'smtpAuthFailed',
   'smtpConnection',
+  'outlookUnavailable',
+  'outlookBlocked',
 ])
 
 export function sendStamp(id: number, createdAt: string): string {

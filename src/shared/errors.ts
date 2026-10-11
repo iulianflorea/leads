@@ -24,6 +24,9 @@ export const errorCodes = [
   'duplicate',
   'jobNotResumable',
   'backupInvalid',
+  'outlookUnavailable',
+  'outlookBlocked',
+  'outlookError',
 ] as const
 
 export type ErrorCode = (typeof errorCodes)[number]

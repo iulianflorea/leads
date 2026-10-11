@@ -66,6 +66,9 @@ jobs:
       # postinstall runs `electron-builder install-app-deps`, which prepares native modules
       # (better-sqlite3) for Electron on this platform.
       - run: npm ci
+      - name: Check the Outlook PowerShell script
+        if: matrix.name == 'windows'
+        run: npx vitest run tests/unit/outlook-windows.test.ts
       - name: Build
         run: npm run build
         env:

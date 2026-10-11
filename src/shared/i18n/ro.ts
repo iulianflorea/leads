@@ -416,6 +416,27 @@ export const ro = {
     method: 'Metoda de trimitere',
     methodGraph: 'Outlook / Microsoft 365',
     methodSmtp: 'Server SMTP',
+    methodOutlook: 'Outlook instalat',
+    outlookIntro:
+      'Emailurile se trimit prin Outlook-ul clasic instalat pe acest calculator, din contul deja conectat acolo. Nu e nevoie de înregistrare în Azure. Emailurile trimise apar în „Trimise” din Outlook.',
+    outlookRequirements:
+      'Funcționează doar pe Windows, cu Outlook clasic (nu cu „noul Outlook”). Outlook trebuie să fie instalat și configurat; dacă e închis, aplicația îl pornește.',
+    outlookPrompt:
+      'Dacă Outlook afișează „Un program încearcă să trimită email în numele tău”, alege Permite. Mesajul apare de obicei când antivirusul nu e recunoscut ca actualizat.',
+    outlookAccount: 'Contul din Outlook',
+    outlookAccountHint: 'Contul din care pleacă emailurile.',
+    outlookDefault: 'Contul implicit din Outlook',
+    outlookDetect: 'Verifică Outlook',
+    outlookDetected: {
+      one: 'Am găsit {count} cont în Outlook.',
+      few: 'Am găsit {count} conturi în Outlook.',
+      other: 'Am găsit {count} de conturi în Outlook.',
+    },
+    outlookNoAccounts: 'Outlook nu are niciun cont configurat.',
+    outlookNotWindows:
+      'Această metodă este disponibilă doar pe Windows, cu Outlook clasic instalat.',
+    outlookOutbox:
+      'Outlook trimite emailurile din „Outbox”; dacă lucrezi offline în Outlook, ele pleacă la reconectare.',
     methodMock: 'Mod demonstrativ',
     methodMockHint:
       'Nu se trimite nimic — emailurile sunt doar simulate. Util pentru a încerca aplicația.',
@@ -592,6 +613,7 @@ export const ro = {
     connected: 'Conectat ca {email}',
     useDemo: 'Încearcă fără cont (mod demonstrativ)',
     useSmtp: 'Folosesc alt server (SMTP)',
+    useOutlookDesktop: 'Trimite prin Outlook instalat',
     importButton: 'Alege fișierul Excel',
     imported: { one: 'Ai {count} lead', few: 'Ai {count} leaduri', other: 'Ai {count} de leaduri' },
     useStarter: 'Folosește șablonul recomandat',
@@ -637,6 +659,11 @@ export const ro = {
     duplicate: 'Există deja un element cu același nume.',
     jobNotResumable: 'Această trimitere nu mai poate fi reluată.',
     backupInvalid: 'Fișierul ales nu este un backup valid al aplicației.',
+    outlookUnavailable:
+      'Nu am putut porni Outlook pe acest calculator. Verifică dacă Outlook clasic este instalat și configurat (noul Outlook nu este suportat).',
+    outlookBlocked:
+      'Outlook a blocat trimiterea sau nu a răspuns. Dacă a apărut întrebarea „Un program încearcă să trimită email”, alege Permite, apoi reia.',
+    outlookError: 'Outlook a raportat o eroare la trimitere. Verifică Outlook și încearcă din nou.',
   },
   actions: {
     reconnect: 'Reconectează',
