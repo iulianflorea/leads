@@ -11,6 +11,8 @@ import type { Screen } from '@renderer/stores/nav'
 import type { MessageKey } from '@renderer/lib/i18n'
 import { SettingsScreen } from './SettingsScreen'
 import { ComingSoon } from './ComingSoon'
+import { ImportScreen } from './import/ImportScreen'
+import { LeadsScreen } from './leads/LeadsScreen'
 
 export interface ScreenDef {
   id: Screen
@@ -26,14 +28,14 @@ export const screens: ScreenDef[] = [
     id: 'leads',
     label: 'nav.leads',
     icon: <Users size={16} />,
-    component: ComingSoon,
+    component: LeadsScreen,
     shortcut: '1',
   },
   {
     id: 'import',
     label: 'nav.import',
     icon: <FileSpreadsheet size={16} />,
-    component: ComingSoon,
+    component: ImportScreen,
     shortcut: '2',
   },
   {

@@ -1,13 +1,20 @@
-import { app, BrowserWindow, Menu, shell } from 'electron'
+import { app, BrowserWindow, Menu } from 'electron'
 import { APP_NAME } from '@shared/config'
-import type { Platform } from '@shared/types'
 import { logger } from './logger'
 import { createMainWindow } from './window'
-import { broadcast, registerIpc } from './ipc/registry'
+import { registerIpc } from './ipc/registry'
 import { SettingsService } from './services/settings'
 import { openDatabase } from './db/connection'
 import { SqliteSettingsStore } from './repos/settings'
+import { LeadsRepo } from './repos/leads'
+import { ListsRepo } from './repos/lists'
+import { MappingsRepo } from './repos/mappings'
+import { ImportService } from './import/service'
 import { paths } from './paths'
+import type { AppContext } from './context'
+import { appHandlers } from './ipc/handlers/app'
+import { leadHandlers } from './ipc/handlers/leads'
+import { importHandlers } from './ipc/handlers/import'
 
 app.setName(APP_NAME)
 if (process.env.LEADMAILER_USER_DATA) app.setPath('userData', process.env.LEADMAILER_USER_DATA)
@@ -40,32 +47,27 @@ function buildMenu(): void {
   )
 }
 
-function bootstrap(): void {
-  logger.info(`[app] starting ${APP_NAME} ${app.getVersion()} on ${process.platform}`)
-  buildMenu()
-
+function createContext(): AppContext {
   const db = openDatabase(paths.db)
   logger.info(`[db] schema version ${String(db.pragma('user_version', { simple: true }))}`)
   const settings = new SettingsService(new SqliteSettingsStore(db))
+  const leads = new LeadsRepo(db)
+  const lists = new ListsRepo(db)
+  const mappings = new MappingsRepo(db)
+  const importer = new ImportService(db, leads, lists, mappings)
+  leads.purgeDeleted()
+  return { db, settings, leads, lists, mappings, importer }
+}
+
+function bootstrap(): void {
+  logger.info(`[app] starting ${APP_NAME} ${app.getVersion()} on ${process.platform}`)
+  buildMenu()
+  const ctx = createContext()
 
   registerIpc({
-    'app:getInfo': () => ({
-      name: APP_NAME,
-      version: app.getVersion(),
-      platform: process.platform as Platform,
-      dataPath: app.getPath('userData'),
-      logPath: logger.transports.file.getFile().path,
-      isDev: !app.isPackaged,
-    }),
-    'app:openDataFolder': async () => {
-      await shell.openPath(app.getPath('userData'))
-    },
-    'settings:get': () => settings.get(),
-    'settings:update': (patch) => {
-      const next = settings.update(patch)
-      broadcast('settings:changed', next)
-      return next
-    },
+    ...appHandlers(ctx),
+    ...leadHandlers(ctx),
+    ...importHandlers(ctx),
   })
 
   createMainWindow()
@@ -73,6 +75,7 @@ function bootstrap(): void {
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createMainWindow()
   })
+  app.on('will-quit', () => ctx.db.close())
 }
 
 app.on('window-all-closed', () => {

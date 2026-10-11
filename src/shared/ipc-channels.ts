@@ -9,9 +9,29 @@ export const channelNames = [
   'app:openDataFolder',
   'settings:get',
   'settings:update',
+  'lists:list',
+  'lists:create',
+  'lists:rename',
+  'lists:delete',
+  'leads:query',
+  'leads:get',
+  'leads:create',
+  'leads:update',
+  'leads:delete',
+  'leads:restore',
+  'leads:setStatus',
+  'import:pickFile',
+  'import:open',
+  'import:preview',
+  'import:validate',
+  'import:commit',
+  'import:close',
 ] as const satisfies readonly ChannelName[]
 
-export const eventNames = ['settings:changed'] as const satisfies readonly EventName[]
+export const eventNames = [
+  'settings:changed',
+  'data:changed',
+] as const satisfies readonly EventName[]
 
 type Missing<A, B> = Exclude<A, B>
 // Compile-time guard: fails if a contract channel is missing from the list above.
