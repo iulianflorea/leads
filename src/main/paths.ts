@@ -14,6 +14,9 @@ export const paths = {
     mkdirSync(dir, { recursive: true })
     return dir
   },
+  get restoreStaging(): string {
+    return join(this.root, 'restore-staging')
+  },
   get authCache(): string {
     return join(this.root, 'auth-cache.bin')
   },

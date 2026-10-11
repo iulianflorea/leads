@@ -3,12 +3,19 @@ import { motion } from 'framer-motion'
 import { CheckCircle2 } from 'lucide-react'
 import { useImport } from '@renderer/stores/import'
 import { useNav } from '@renderer/stores/nav'
+import { useOnboarding } from '@renderer/stores/onboarding'
+import { useEffect } from 'react'
 import { t, tp } from '@renderer/lib/i18n'
 import { Button } from '@renderer/components/ui'
 
 export function DoneStep(): ReactNode {
   const { result, reset } = useImport()
   const go = useNav((s) => s.go)
+  // Continue the first-run guide at the template step.
+  useEffect(() => {
+    const onboarding = useOnboarding.getState()
+    if (result && onboarding.resumeAfterImport) onboarding.show(2)
+  }, [result])
   if (!result) return null
   return (
     <div className="empty" style={{ paddingTop: 48 }}>

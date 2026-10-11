@@ -19,6 +19,9 @@ export function appHandlers(ctx: AppContext): Partial<Handlers> {
     'app:openDataFolder': async () => {
       await shell.openPath(app.getPath('userData'))
     },
+    'app:openLogs': () => {
+      shell.showItemInFolder(logger.transports.file.getFile().path)
+    },
     'settings:get': () => ctx.settings.get(),
     'settings:update': (patch) => {
       const next = ctx.settings.update(patch)

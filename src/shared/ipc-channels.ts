@@ -7,6 +7,7 @@ import type { ChannelName, EventName } from './ipc-contract'
 export const channelNames = [
   'app:getInfo',
   'app:openDataFolder',
+  'app:openLogs',
   'settings:get',
   'settings:update',
   'lists:list',
@@ -66,6 +67,8 @@ export const channelNames = [
   'history:get',
   'history:exportCsv',
   'history:resolveUnknown',
+  'backup:export',
+  'backup:import',
 ] as const satisfies readonly ChannelName[]
 
 export const eventNames = [

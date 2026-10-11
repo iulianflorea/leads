@@ -17,8 +17,9 @@ export interface Launched {
  * so no network calls to Microsoft Graph happen during tests.
  */
 export async function launch(
-  options: { userData?: string; env?: Record<string, string> } = {},
+  options: { userData?: string; env?: Record<string, string>; keepOnboarding?: boolean } = {},
 ): Promise<Launched> {
+  const fresh = !options.userData
   const userData = options.userData ?? mkdtempSync(join(tmpdir(), 'leadmailer-e2e-'))
   const app = await electron.launch({
     args: [root],
@@ -33,6 +34,11 @@ export async function launch(
   })
   const page = await app.firstWindow()
   await page.getByRole('button', { name: 'Leaduri', exact: true }).waitFor()
+  if (fresh && !options.keepOnboarding) {
+    // First run shows the welcome guide; most tests start from an empty app instead.
+    await page.getByTestId('onboarding-skip-all').click()
+    await page.locator('.onb-overlay').waitFor({ state: 'detached' })
+  }
   return { app, page, userData }
 }
 

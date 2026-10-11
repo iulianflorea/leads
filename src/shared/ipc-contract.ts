@@ -70,6 +70,7 @@ const none = z.undefined()
 export const ipcContract = {
   'app:getInfo': channel<AppInfo>()(none),
   'app:openDataFolder': channel<void>()(none),
+  'app:openLogs': channel<void>()(none),
   'settings:get': channel<Settings>()(none),
   'settings:update': channel<Settings>()(settingsPatchSchema),
 
@@ -139,6 +140,8 @@ export const ipcContract = {
   'history:query': channel<SendRecord[]>()(historyQuerySchema),
   'history:get': channel<SendRecord & { bodyHtml: string }>()(idSchema),
   'history:exportCsv': channel<string | null>()(historyQuerySchema),
+  'backup:export': channel<string | null>()(none),
+  'backup:import': channel<boolean>()(none),
   'history:resolveUnknown': channel<void>()(
     idSchema.extend({ action: z.enum(['markSent', 'retry']) }),
   ),

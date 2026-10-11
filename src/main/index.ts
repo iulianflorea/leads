@@ -31,6 +31,8 @@ import { HistoryService } from './services/history'
 import { MailService } from './mailer/service'
 import { QueueService } from './queue/service'
 import { SqliteQueueStore } from './queue/store'
+import { applyPendingRestore } from './services/backup'
+import { backupHandlers } from './ipc/handlers/backup'
 
 app.setName(APP_NAME)
 if (process.env.LEADMAILER_USER_DATA) app.setPath('userData', process.env.LEADMAILER_USER_DATA)
@@ -64,6 +66,11 @@ function buildMenu(): void {
 }
 
 function createContext(): AppContext {
+  if (
+    applyPendingRestore({ dbFile: paths.db, pdfDir: paths.pdfs, stagingDir: paths.restoreStaging })
+  ) {
+    logger.info('[backup] restored data from a backup')
+  }
   const db = openDatabase(paths.db)
   logger.info(`[db] schema version ${String(db.pragma('user_version', { simple: true }))}`)
   const pdfDir = (): string => paths.pdfs
@@ -138,6 +145,7 @@ function bootstrap(): void {
     ...templateHandlers(ctx),
     ...sendHandlers(ctx),
     ...bulkHandlers(ctx),
+    ...backupHandlers(ctx),
   })
 
   // Sends interrupted by a crash or forced quit are checked; their jobs wait for "Resume".

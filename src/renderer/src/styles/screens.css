@@ -1028,3 +1028,134 @@
   background: var(--accent);
   transition: width var(--dur-med);
 }
+.settings-wrap {
+  max-width: 760px;
+  margin: 0 auto;
+  padding-bottom: var(--space-6);
+}
+.unsubscribe-editor {
+  flex: 1;
+  display: flex;
+}
+
+/* Onboarding */
+.onb-overlay {
+  z-index: 70;
+  backdrop-filter: blur(8px);
+}
+.onb-card {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  width: min(900px, calc(100vw - 64px));
+  min-height: 480px;
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+.onb-side {
+  padding: var(--space-6) var(--space-5);
+  background: linear-gradient(160deg, var(--accent-soft), transparent 70%), var(--surface-2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.onb-side h2 {
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.onb-mark {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+}
+.onb-steps {
+  list-style: none;
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.onb-steps li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-3);
+  font-weight: 500;
+}
+.onb-steps li.is-current {
+  color: var(--text);
+}
+.onb-steps li.is-done {
+  color: var(--text-2);
+}
+.onb-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  background: var(--surface-active);
+  flex-shrink: 0;
+}
+.is-current .onb-dot {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.is-done .onb-dot {
+  background: var(--success);
+  color: #fff;
+}
+.onb-main {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-6);
+  gap: var(--space-3);
+}
+.onb-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  align-items: flex-start;
+}
+.onb-content h3 {
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.onb-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.onb-alt {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+.onb-done {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  background: var(--success-soft);
+  color: var(--success);
+  font-weight: 550;
+}
+.onb-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

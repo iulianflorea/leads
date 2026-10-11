@@ -12,6 +12,7 @@ import { ConfirmHost } from './components/Confirm'
 import { CommandPalette } from './components/CommandPalette'
 import { SendDialogHost } from './screens/send/SendDialog'
 import { BulkSendDialogHost } from './screens/send/BulkSendDialog'
+import { Onboarding } from './screens/onboarding/Onboarding'
 import { useQueue } from './stores/queue'
 import { toast } from './stores/toast'
 import { Button, Kbd } from './components/ui'
@@ -120,6 +121,7 @@ export function App(): ReactNode {
           </motion.div>
         </AnimatePresence>
       </main>
+      <Onboarding />
       <CommandPalette />
       <SendDialogHost />
       <BulkSendDialogHost />
