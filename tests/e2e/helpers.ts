@@ -16,8 +16,10 @@ export interface Launched {
  * Launches the built app with an isolated data folder and the mock mail provider,
  * so no network calls to Microsoft Graph happen during tests.
  */
-export async function launch(): Promise<Launched> {
-  const userData = mkdtempSync(join(tmpdir(), 'leadmailer-e2e-'))
+export async function launch(
+  options: { userData?: string; env?: Record<string, string> } = {},
+): Promise<Launched> {
+  const userData = options.userData ?? mkdtempSync(join(tmpdir(), 'leadmailer-e2e-'))
   const app = await electron.launch({
     args: [root],
     env: {
@@ -25,6 +27,8 @@ export async function launch(): Promise<Launched> {
       LEADMAILER_USER_DATA: userData,
       LEADMAILER_MAIL_PROVIDER: 'mock',
       NODE_ENV: 'production',
+      LEADMAILER_MOCK_DELAY_MS: '30',
+      ...options.env,
     },
   })
   const page = await app.firstWindow()
@@ -37,4 +41,22 @@ export async function stubOpenDialog(app: ElectronApplication, path: string): Pr
   await app.evaluate(({ dialog }, file) => {
     dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [file] })
   }, path)
+}
+
+/** Imports the sample spreadsheet with the auto-detected mapping into a new list. */
+export async function importSample(app: ElectronApplication, page: Page): Promise<void> {
+  await stubOpenDialog(app, join(samplesDir, 'leads-example.xlsx'))
+  await page.getByRole('button', { name: 'Import', exact: true }).click()
+  await page.getByTestId('pick-file').click()
+  await page.locator('.sheet-card', { hasText: 'Leaduri' }).click()
+  await page.getByTestId('mapping-continue').click()
+  await page.getByTestId('import-commit').click()
+  await page.getByRole('button', { name: 'Vezi leadurile' }).click()
+}
+
+/** Creates the starter template from the Templates screen. */
+export async function createStarterTemplate(page: Page): Promise<void> {
+  await page.getByRole('button', { name: 'Șabloane', exact: true }).click()
+  await page.getByRole('button', { name: 'Creează primul șablon' }).click()
+  await page.locator('.template-item').first().waitFor()
 }

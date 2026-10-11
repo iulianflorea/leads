@@ -1,6 +1,7 @@
 import { type ReactNode, useCallback, useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { FileSpreadsheet, Plus, Search, Trash2, Users, X } from 'lucide-react'
+import { FileSpreadsheet, Plus, Search, Send, Trash2, Users, X } from 'lucide-react'
+import { useBulkDialog } from '../send/BulkSendDialog'
 import { leadStatuses, type LeadStatus } from '@shared/schemas/lead'
 import { useLeads, defaultFilters } from '@renderer/stores/leads'
 import { useLists } from '@renderer/stores/lists'
@@ -243,6 +244,15 @@ export function LeadsScreen(): ReactNode {
             <option value="false">{t('leads.pdfNo')}</option>
           </select>
           <div className="grow" />
+          {filters.listId !== null && rows.length > 0 && selected.size === 0 && (
+            <Button
+              size="sm"
+              icon={<Send size={14} />}
+              onClick={() => useBulkDialog.getState().open({ listId: filters.listId! })}
+            >
+              {t('bulk.sendList')}
+            </Button>
+          )}
           <span className="subtle tabular" aria-live="polite">
             {loading && !loaded ? '' : tp('leads.count', rows.length)}
           </span>
@@ -276,6 +286,19 @@ export function LeadsScreen(): ReactNode {
                 </option>
               ))}
             </select>
+            <Button
+              size="sm"
+              variant="primary"
+              icon={<Send size={14} />}
+              onClick={() =>
+                useBulkDialog
+                  .getState()
+                  .open({ leadIds: rows.filter((r) => selected.has(r.id)).map((r) => r.id) })
+              }
+              data-testid="bulk-open"
+            >
+              {t('bulk.action')}
+            </Button>
             <Button
               size="sm"
               variant="danger-ghost"

@@ -1,4 +1,11 @@
-import type { SendAttachment, SendRecord, SendStatus } from '@shared/schemas/send'
+import {
+  historyQuerySchema,
+  type HistoryQuery,
+  type SendAttachment,
+  type SendRecord,
+  type SendStatus,
+} from '@shared/schemas/send'
+import { foldText } from '@shared/matching/normalize'
 import { normalizeEmail } from '@shared/matching/normalize'
 import type { DB } from '../db/connection'
 
@@ -169,6 +176,41 @@ export class SendsRepo {
            ORDER BY created_at DESC LIMIT 200`,
         )
         .all(leadId, leadId) as Raw[]
+    ).map((r) => {
+      const { bodyHtml: _body, ...rest } = toRecord(r)
+      return rest
+    })
+  }
+
+  /** History rows (without bodies), newest first. Search ignores case and diacritics. */
+  query(input: HistoryQuery, limit = 20_000): SendRecord[] {
+    const q = historyQuerySchema.parse(input)
+    const where = ['1 = 1']
+    const params: unknown[] = []
+    if (q.search.trim()) {
+      where.push(
+        "fold(to_email || ' ' || to_name || ' ' || subject || ' ' || template_name) LIKE ?",
+      )
+      params.push(`%${foldText(q.search).replace(/[%_]/g, '')}%`)
+    }
+    if (q.status) {
+      where.push('status = ?')
+      params.push(q.status)
+    }
+    if (q.templateId !== null) {
+      where.push('template_id = ?')
+      params.push(q.templateId)
+    }
+    if (q.jobId !== null) {
+      where.push('job_id = ?')
+      params.push(q.jobId)
+    }
+    return (
+      this.db
+        .prepare(
+          `SELECT * FROM sends WHERE ${where.join(' AND ')} ORDER BY COALESCE(sent_at, created_at) DESC, id DESC LIMIT ?`,
+        )
+        .all(...params, limit) as Raw[]
     ).map((r) => {
       const { bodyHtml: _body, ...rest } = toRecord(r)
       return rest

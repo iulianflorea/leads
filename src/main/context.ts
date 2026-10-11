@@ -11,6 +11,9 @@ import type { MessageBuilder } from './services/message'
 import type { MailService } from './mailer/service'
 import type { SendsRepo } from './repos/sends'
 import type { SendService } from './services/send'
+import type { BulkService } from './services/bulk'
+import type { QueueService } from './queue/service'
+import type { HistoryService } from './services/history'
 
 /** Services shared by IPC handlers. */
 export interface AppContext {
@@ -27,4 +30,7 @@ export interface AppContext {
   mail: MailService
   sends: SendsRepo
   sender: SendService
+  bulk: BulkService
+  queue: QueueService
+  history: HistoryService
 }

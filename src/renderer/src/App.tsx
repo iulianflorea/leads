@@ -11,6 +11,9 @@ import { Toaster } from './components/Toaster'
 import { ConfirmHost } from './components/Confirm'
 import { CommandPalette } from './components/CommandPalette'
 import { SendDialogHost } from './screens/send/SendDialog'
+import { BulkSendDialogHost } from './screens/send/BulkSendDialog'
+import { useQueue } from './stores/queue'
+import { toast } from './stores/toast'
 import { Button, Kbd } from './components/ui'
 import { isModEvent, modKey } from './lib/platform'
 import { t } from './lib/i18n'
@@ -68,6 +71,20 @@ export function App(): ReactNode {
   useEffect(() => {
     void load()
     void useAccount.getState().load()
+    void useQueue
+      .getState()
+      .load()
+      .then(() => {
+        const interrupted = useQueue
+          .getState()
+          .jobs.filter((j) => j.status === 'paused' && j.pausedReason === 'interrupted')
+        if (interrupted.length) {
+          toast.warning(t('queue.paused'), t('queue.interrupted'), {
+            label: t('queue.resume'),
+            run: () => useNav.getState().go('history'),
+          })
+        }
+      })
   }, [load])
 
   const def = screenDef(screen)
@@ -105,6 +122,7 @@ export function App(): ReactNode {
       </main>
       <CommandPalette />
       <SendDialogHost />
+      <BulkSendDialogHost />
       <ConfirmHost />
       <Toaster />
     </div>

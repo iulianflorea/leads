@@ -69,7 +69,7 @@ export class MessageBuilder {
     }
   }
 
-  build(source: TemplateSource, leadId: number | null): BuiltMessage {
+  build(source: TemplateSource, leadId: number | null, extras?: string[]): BuiltMessage {
     const template = 'templateId' in source ? this.templates.get(source.templateId) : null
     const content = template ?? ('draft' in source ? source.draft : { subject: '', bodyHtml: '' })
     const settings = this.settings.get()
@@ -82,7 +82,7 @@ export class MessageBuilder {
         bodyHtml: content.bodyHtml,
         signatureHtml: settings.signatureHtml,
         unsubscribeHtml: settings.unsubscribeEnabled ? settings.unsubscribeHtml : null,
-        knownExtras: this.knownExtras(),
+        knownExtras: extras ?? this.knownExtras(),
       },
       data,
     )

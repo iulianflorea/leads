@@ -5,9 +5,11 @@ import { useNav } from '@renderer/stores/nav'
 import { screens } from '@renderer/screens/registry'
 import { t } from '@renderer/lib/i18n'
 import { AccountChip } from './AccountChip'
+import { activeJob, useQueue } from '@renderer/stores/queue'
 
 export function Sidebar({ footer }: { footer?: ReactNode }): ReactNode {
   const { screen, go } = useNav()
+  const running = activeJob(useQueue((s) => s.jobs))
   return (
     <aside className="sidebar" aria-label="Navigare principală">
       <div className="sidebar-top drag">
@@ -32,7 +34,28 @@ export function Sidebar({ footer }: { footer?: ReactNode }): ReactNode {
               {s.icon}
               {t(s.label)}
             </button>
-          ))}
+          ))
+          .flatMap((el) =>
+            el.key === 'history' && running
+              ? [
+                  el,
+                  <div
+                    key="progress"
+                    className="nav-progress"
+                    role="progressbar"
+                    aria-label={t('queue.sidebar')}
+                    aria-valuenow={running.sent + running.failed + running.skipped}
+                    aria-valuemax={running.total}
+                  >
+                    <div
+                      style={{
+                        width: `${Math.round(((running.sent + running.failed + running.skipped) / Math.max(1, running.total)) * 100)}%`,
+                      }}
+                    />
+                  </div>,
+                ]
+              : [el],
+          )}
       </nav>
       <div className="sidebar-spacer" />
       <div className="sidebar-footer">

@@ -80,6 +80,25 @@ LEFT JOIN pv ON pv.lead_id = l.id
 LEFT JOIN sv ON sv.lead_id = l.id
 `
 
+/** Single-lead variant using indexed correlated subqueries instead of whole-table aggregates. */
+const SELECT_ONE = `
+SELECT l.id, l.list_id, li.name AS list_name, l.name, l.first_name, l.email, l.phone, l.address,
+       l.product_raw, l.status, l.extra, l.created_at, l.updated_at,
+       (SELECT COUNT(*) FROM lead_product_values x WHERE x.lead_id = l.id) AS pv_total,
+       (SELECT COUNT(*) FROM lead_product_values x JOIN products p ON p.id = x.product_id
+         WHERE x.lead_id = l.id AND p.active = 1 AND p.pdf_file IS NOT NULL) AS pv_with_pdf,
+       (SELECT COUNT(*) FROM lead_product_values x
+         LEFT JOIN products p ON p.id = x.product_id
+         LEFT JOIN ignored_product_values i ON i.value_norm = x.value_norm
+         WHERE x.lead_id = l.id AND (p.id IS NULL OR p.active = 0 OR p.pdf_file IS NULL)
+           AND i.value_norm IS NULL) AS pv_unresolved,
+       (SELECT COUNT(*) FROM sends s WHERE s.lead_id = l.id AND s.status = 'sent') AS sent_count,
+       (SELECT MAX(s.sent_at) FROM sends s WHERE s.lead_id = l.id AND s.status = 'sent') AS last_sent_at
+FROM leads l
+LEFT JOIN lists li ON li.id = l.list_id
+WHERE l.id = ? AND l.deleted_at IS NULL
+`
+
 const SORT_SQL: Record<string, string> = {
   name: 'l.name COLLATE NOCASE',
   email: 'l.email COLLATE NOCASE',
@@ -180,8 +199,7 @@ export class LeadsRepo {
   }
 
   get(id: number): LeadDetail {
-    const raw = this.db.prepare(`${SELECT} WHERE l.id = ? AND l.deleted_at IS NULL`).get(id) as
-      RawLeadRow | undefined
+    const raw = this.db.prepare(SELECT_ONE).get(id) as RawLeadRow | undefined
     if (!raw) throw new AppError('notFound', 'lead')
     const products = this.db
       .prepare(

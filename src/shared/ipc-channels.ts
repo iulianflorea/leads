@@ -55,12 +55,24 @@ export const channelNames = [
   'send:single',
   'send:test',
   'leads:history',
+  'send:prepareBulk',
+  'send:startBulk',
+  'queue:jobs',
+  'queue:pause',
+  'queue:resume',
+  'queue:cancel',
+  'queue:retryFailed',
+  'history:query',
+  'history:get',
+  'history:exportCsv',
+  'history:resolveUnknown',
 ] as const satisfies readonly ChannelName[]
 
 export const eventNames = [
   'settings:changed',
   'data:changed',
   'account:changed',
+  'queue:progress',
 ] as const satisfies readonly EventName[]
 
 type Missing<A, B> = Exclude<A, B>

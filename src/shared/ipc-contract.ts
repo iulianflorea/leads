@@ -38,8 +38,14 @@ import {
 } from './schemas/template'
 import type { AccountStatus } from './schemas/mail'
 import {
+  bulkPrepareSchema,
+  bulkStartSchema,
+  historyQuerySchema,
+  jobIdSchema,
   sendSingleSchema,
   sendTestSchema,
+  type BulkSummary,
+  type JobProgress,
   type LeadSendChecks,
   type SendOutcome,
   type SendRecord,
@@ -121,6 +127,21 @@ export const ipcContract = {
   'send:single': channel<SendOutcome>()(sendSingleSchema),
   'send:test': channel<string>()(sendTestSchema),
   'leads:history': channel<SendRecord[]>()(idSchema),
+
+  'send:prepareBulk': channel<BulkSummary>()(bulkPrepareSchema),
+  'send:startBulk': channel<number>()(bulkStartSchema),
+  'queue:jobs': channel<JobProgress[]>()(none),
+  'queue:pause': channel<void>()(jobIdSchema),
+  'queue:resume': channel<void>()(jobIdSchema),
+  'queue:cancel': channel<void>()(jobIdSchema),
+  'queue:retryFailed': channel<number>()(jobIdSchema),
+
+  'history:query': channel<SendRecord[]>()(historyQuerySchema),
+  'history:get': channel<SendRecord & { bodyHtml: string }>()(idSchema),
+  'history:exportCsv': channel<string | null>()(historyQuerySchema),
+  'history:resolveUnknown': channel<void>()(
+    idSchema.extend({ action: z.enum(['markSent', 'retry']) }),
+  ),
 } as const
 
 export type IpcContract = typeof ipcContract
@@ -136,5 +157,6 @@ export interface IpcEvents {
   /** Leads, lists or product matches changed; views should refetch. */
   'data:changed': { scope: Array<'leads' | 'lists' | 'products' | 'templates' | 'sends'> }
   'account:changed': AccountStatus
+  'queue:progress': JobProgress
 }
 export type EventName = keyof IpcEvents

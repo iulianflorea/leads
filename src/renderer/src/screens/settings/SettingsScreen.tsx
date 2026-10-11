@@ -4,7 +4,7 @@ import type { Theme } from '@shared/schemas/settings'
 import { languages } from '@shared/i18n'
 import { useSettings } from '@renderer/stores/settings'
 import { call } from '@renderer/lib/api'
-import { t } from '@renderer/lib/i18n'
+import { t, tp } from '@renderer/lib/i18n'
 import { Button, Segmented, SkeletonRows } from '@renderer/components/ui'
 import { useNav } from '@renderer/stores/nav'
 import { AccountSection } from './AccountSection'
@@ -32,6 +32,36 @@ export function SettingsScreen(): ReactNode {
         <p className="page-intro">{t('settings.subtitle')}</p>
 
         <AccountSection />
+
+        <h2 className="group-title" id="settings-sending">
+          {t('settings.sending')}
+        </h2>
+        <div className="group">
+          <div className="group-row">
+            <div className="group-row-label">
+              <div>{t('settings.speed')}</div>
+              <div className="subtle">
+                {settings.sendIntervalSeconds < 2 ? (
+                  <span className="text-warning">{t('settings.speedWarning')}</span>
+                ) : (
+                  t('settings.speedHint')
+                )}
+              </div>
+            </div>
+            <select
+              className="select"
+              aria-label={t('settings.speed')}
+              value={settings.sendIntervalSeconds}
+              onChange={(e) => void update({ sendIntervalSeconds: Number(e.target.value) })}
+            >
+              {[1, 2, 3, 5, 10, 15, 30, 60].map((n) => (
+                <option key={n} value={n}>
+                  {tp('settings.speedValue', n)}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
 
         <h2 className="group-title">{t('settings.appearance')}</h2>
         <div className="group">

@@ -10,11 +10,11 @@ import {
 import type { Screen } from '@renderer/stores/nav'
 import type { MessageKey } from '@renderer/lib/i18n'
 import { SettingsScreen } from './settings/SettingsScreen'
-import { ComingSoon } from './ComingSoon'
 import { ImportScreen } from './import/ImportScreen'
 import { LeadsScreen } from './leads/LeadsScreen'
 import { ProductsScreen } from './products/ProductsScreen'
 import { TemplatesScreen } from './templates/TemplatesScreen'
+import { HistoryScreen } from './history/HistoryScreen'
 
 export interface ScreenDef {
   id: Screen
@@ -58,7 +58,7 @@ export const screens: ScreenDef[] = [
     id: 'history',
     label: 'nav.history',
     icon: <History size={16} />,
-    component: ComingSoon,
+    component: HistoryScreen,
     shortcut: '5',
   },
   {
