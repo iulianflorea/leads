@@ -62,13 +62,15 @@ Pentru trimiterea prin Outlook ai nevoie de un **Application (client) ID**. Înr
 
    La conturile de firmă, un administrator poate apăsa _Grant admin consent_. Altfel, fiecare utilizator își dă acordul la prima conectare.
 
-6. Pune Client ID-ul în aplicație, într-una dintre variantele:
-   - în cod: `MS_CLIENT_ID` din `src/shared/config.ts`;
-   - la build: `LEADMAILER_MS_CLIENT_ID=<id> npm run dist:mac` (valoarea e inclusă în pachet);
-   - în GitHub Actions: secretul de repository **`MS_CLIENT_ID`** (workflow-ul îl transmite la build);
-   - la rulare: variabila de mediu `LEADMAILER_MS_CLIENT_ID`.
+6. Pune Client ID-ul în aplicație. Cel mai simplu e din interfață: **Setări → Cont de email → Outlook / Microsoft 365 → „ID aplicație Microsoft (Client ID)”** (câmpul apare și în ghidul de început). Lipește ID-ul și apasă **Salvează**. Aplicația verifică formatul, îl păstrează în baza de date locală și îl folosește imediat, fără repornire. Dacă schimbi ID-ul, contul conectat se deconectează, pentru că tokenurile aparțin înregistrării vechi.
 
-Ordinea de prioritate: variabila de la rulare → ID-ul de la build → constanta din cod.
+   Alternative, utile pentru distribuirea aplicației către alți utilizatori:
+   - la build: `LEADMAILER_MS_CLIENT_ID=<id> npm run dist:mac` (ID-ul e inclus în pachet, iar utilizatorii nu mai trebuie să-l introducă);
+   - în GitHub Actions: secretul de repository **`MS_CLIENT_ID`**;
+   - în cod: `MS_CLIENT_ID` din `src/shared/config.ts`;
+   - la rulare: variabila de mediu `LEADMAILER_MS_CLIENT_ID` (dacă e setată, câmpul din interfață devine doar informativ).
+
+Ordinea de prioritate: variabila de mediu → ID-ul salvat din Setări → ID-ul de la build → constanta din cod.
 
 ### Cum funcționează conectarea
 

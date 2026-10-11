@@ -13,4 +13,8 @@ export interface AccountStatus {
   configured: boolean
   /** SMTP password stored (never returned itself). */
   hasSmtpPassword: boolean
+  /** Where the Microsoft Client ID comes from; "env" cannot be changed from the UI. */
+  clientIdSource: ClientIdSource
 }
+
+export type ClientIdSource = 'env' | 'settings' | 'build' | 'code' | 'none'

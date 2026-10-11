@@ -8,21 +8,32 @@ import { call } from '@renderer/lib/api'
 import { t } from '@renderer/lib/i18n'
 import { confirm } from '@renderer/components/Confirm'
 import { Button, Field, Segmented, Switch } from '@renderer/components/ui'
+import { ClientIdForm, ClientIdSummary } from './ClientIdForm'
 
 function MicrosoftAccount(): ReactNode {
   const { status, connecting, login, logout } = useAccount()
+  const [editingId, setEditingId] = useState(false)
   if (!status) return null
   if (!status.configured) {
     return (
-      <div className="callout callout-warning">
-        <AlertTriangle size={16} />
-        <span>{t('account.notConfiguredGraph')}</span>
+      <div className="connect-box">
+        <div className="callout callout-warning" style={{ alignSelf: 'stretch' }}>
+          <AlertTriangle size={16} />
+          <span>{t('account.clientIdNeeded')}</span>
+        </div>
+        <ClientIdForm />
       </div>
     )
   }
+  const idEditor = editingId ? (
+    <ClientIdForm compact />
+  ) : (
+    <ClientIdSummary onChange={() => setEditingId(true)} />
+  )
   if (!status.account) {
     return (
       <div className="connect-box">
+        {idEditor}
         <p className="muted">{t('account.connectHint')}</p>
         <Button
           variant="primary"
@@ -39,32 +50,35 @@ function MicrosoftAccount(): ReactNode {
   }
   const email = status.account.email
   return (
-    <div className="group">
-      <div className="group-row">
-        <CheckCircle2 size={18} className="text-success" />
-        <div className="group-row-label">
-          <div>{status.account.name}</div>
-          <div className="subtle">{t('account.connected', { email })}</div>
+    <div className="stack">
+      <div className="group">
+        <div className="group-row">
+          <CheckCircle2 size={18} className="text-success" />
+          <div className="group-row-label">
+            <div>{status.account.name}</div>
+            <div className="subtle">{t('account.connected', { email })}</div>
+          </div>
+          <Button icon={<RefreshCw size={14} />} loading={connecting} onClick={() => void login()}>
+            {t('account.switchAccount')}
+          </Button>
+          <Button
+            variant="danger-ghost"
+            icon={<LogOut size={14} />}
+            onClick={async () => {
+              const ok = await confirm({
+                title: t('account.disconnectTitle', { email }),
+                description: t('account.disconnectText'),
+                confirmLabel: t('account.disconnect'),
+                destructive: true,
+              })
+              if (ok) await logout()
+            }}
+          >
+            {t('account.disconnect')}
+          </Button>
         </div>
-        <Button icon={<RefreshCw size={14} />} loading={connecting} onClick={() => void login()}>
-          {t('account.switchAccount')}
-        </Button>
-        <Button
-          variant="danger-ghost"
-          icon={<LogOut size={14} />}
-          onClick={async () => {
-            const ok = await confirm({
-              title: t('account.disconnectTitle', { email }),
-              description: t('account.disconnectText'),
-              confirmLabel: t('account.disconnect'),
-              destructive: true,
-            })
-            if (ok) await logout()
-          }}
-        >
-          {t('account.disconnect')}
-        </Button>
       </div>
+      {idEditor}
     </div>
   )
 }

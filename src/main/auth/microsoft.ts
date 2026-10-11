@@ -6,7 +6,8 @@ import {
   type ICachePlugin,
   LogLevel,
 } from '@azure/msal-node'
-import { isPlaceholderClientId, MS_AUTHORITY, MS_CLIENT_ID, MS_SCOPES } from '@shared/config'
+import { isValidClientId, MS_AUTHORITY, MS_CLIENT_ID, MS_SCOPES } from '@shared/config'
+import type { ClientIdSource } from '@shared/schemas/mail'
 import { AppError } from '@shared/errors'
 import { t } from '@shared/i18n'
 import { logger } from '../logger'
@@ -16,10 +17,30 @@ const SCOPES = [...MS_SCOPES]
 
 declare const __BUILD_MS_CLIENT_ID__: string
 
-/** Runtime env var > ID injected at build time > constant in shared/config.ts. */
-export function microsoftClientId(): string {
-  const buildTime = typeof __BUILD_MS_CLIENT_ID__ === 'string' ? __BUILD_MS_CLIENT_ID__ : ''
-  return process.env.LEADMAILER_MS_CLIENT_ID?.trim() || buildTime.trim() || MS_CLIENT_ID
+function buildTimeClientId(): string {
+  return typeof __BUILD_MS_CLIENT_ID__ === 'string' ? __BUILD_MS_CLIENT_ID__.trim() : ''
+}
+
+/**
+ * Picks the Microsoft Client ID. Priority: LEADMAILER_MS_CLIENT_ID env var > ID saved from
+ * Settings > ID injected at build time > constant in shared/config.ts.
+ */
+export function resolveClientId(sources: {
+  env?: string
+  saved?: string
+  build?: string
+  code?: string
+}): { id: string; source: ClientIdSource } {
+  const pick: Array<[ClientIdSource, string | undefined]> = [
+    ['env', sources.env],
+    ['settings', sources.saved],
+    ['build', sources.build],
+    ['code', sources.code],
+  ]
+  for (const [source, value] of pick) {
+    if (value && isValidClientId(value)) return { id: value.trim(), source }
+  }
+  return { id: '', source: 'none' }
 }
 
 function page(title: string, message: string): string {
@@ -36,16 +57,46 @@ h1{font-size:20px;margin:0 0 8px}p{color:#6e6e73;margin:0}</style></head>
  */
 export class MicrosoftAuth {
   private pca: PublicClientApplication | null = null
+  private pcaClientId = ''
+  private lastClientId: string
 
-  constructor(private readonly cacheFile: string) {}
+  constructor(
+    private readonly cacheFile: string,
+    private readonly savedClientId: () => string,
+  ) {
+    this.lastClientId = this.clientId().id
+  }
+
+  clientId(): { id: string; source: ClientIdSource } {
+    return resolveClientId({
+      env: process.env.LEADMAILER_MS_CLIENT_ID,
+      saved: this.savedClientId(),
+      build: buildTimeClientId(),
+      code: MS_CLIENT_ID,
+    })
+  }
 
   get configured(): boolean {
-    return !isPlaceholderClientId(microsoftClientId())
+    return this.clientId().source !== 'none'
+  }
+
+  /**
+   * Call after settings change. Tokens belong to one app registration, so switching the
+   * Client ID signs out and clears the token cache.
+   */
+  syncClientId(): void {
+    const current = this.clientId().id
+    if (current === this.lastClientId) return
+    this.lastClientId = current
+    this.pca = null
+    secureStore.removeFile(this.cacheFile)
+    logger.info('[auth] Microsoft Client ID changed; signed out')
   }
 
   private client(): PublicClientApplication {
-    if (!this.configured) throw new AppError('authNotConfigured')
-    if (this.pca) return this.pca
+    const { id } = this.clientId()
+    if (!id) throw new AppError('authNotConfigured')
+    if (this.pca && this.pcaClientId === id) return this.pca
     const file = this.cacheFile
     const cachePlugin: ICachePlugin = {
       beforeCacheAccess: async (ctx) => {
@@ -57,7 +108,7 @@ export class MicrosoftAuth {
       },
     }
     this.pca = new PublicClientApplication({
-      auth: { clientId: microsoftClientId(), authority: MS_AUTHORITY },
+      auth: { clientId: id, authority: MS_AUTHORITY },
       cache: { cachePlugin },
       system: {
         loggerOptions: {
@@ -69,6 +120,7 @@ export class MicrosoftAuth {
         },
       },
     })
+    this.pcaClientId = id
     return this.pca
   }
 

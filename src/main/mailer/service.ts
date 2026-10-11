@@ -27,7 +27,10 @@ export class MailService {
     private readonly store: SqliteSettingsStore,
     dataDir: () => string,
   ) {
-    this.microsoft = new MicrosoftAuth(join(dataDir(), 'auth-cache.bin'))
+    this.microsoft = new MicrosoftAuth(
+      join(dataDir(), 'auth-cache.bin'),
+      () => this.settings.get().msClientId,
+    )
     this.graph = new GraphMailProvider(this.microsoft)
     this.smtp = new SmtpMailProvider(
       () => this.settings.get().smtp,
@@ -56,7 +59,13 @@ export class MailService {
           .getAccount()
           .catch(() => null)
       : null
-    return { provider: kind, account, configured, hasSmtpPassword: !!this.smtpPassword() }
+    return {
+      provider: kind,
+      account,
+      configured,
+      hasSmtpPassword: !!this.smtpPassword(),
+      clientIdSource: this.microsoft.clientId().source,
+    }
   }
 
   async login(): Promise<AccountStatus> {
@@ -102,6 +111,7 @@ export class MailService {
   }
 
   onSettingsChanged(): void {
+    this.microsoft.syncClientId()
     this.smtp.reset()
   }
 }

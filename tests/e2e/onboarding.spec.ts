@@ -40,3 +40,29 @@ test('first run guide: account -> import -> template', async () => {
     await app.close()
   }
 })
+
+test('Microsoft Client ID can be entered and saved from Settings', async () => {
+  const { app, page } = await launch({ env: { LEADMAILER_MAIL_PROVIDER: '' } })
+  try {
+    await page.getByRole('button', { name: 'Setări', exact: true }).click()
+    const input = page.getByTestId('client-id-input')
+    await expect(page.getByText('introdu mai întâi ID-ul aplicației Microsoft')).toBeVisible()
+
+    await input.fill('not-a-guid')
+    await input.blur()
+    await expect(page.getByText('ID-ul are forma xxxxxxxx-xxxx')).toBeVisible()
+    await expect(page.getByTestId('client-id-save')).toBeDisabled()
+
+    await input.fill('3f2a1b4c-5d6e-4f70-8a9b-0c1d2e3f4a5b')
+    await page.getByTestId('client-id-save').click()
+    await expect(page.getByTestId('connect-outlook')).toBeVisible()
+    await expect(page.getByText('ID aplicație: 3f2a1b4c…4a5b')).toBeVisible()
+
+    // Saved in the local database: still there after reloading the window.
+    await page.reload()
+    await page.getByRole('button', { name: 'Setări', exact: true }).click()
+    await expect(page.getByText('ID aplicație: 3f2a1b4c…4a5b')).toBeVisible()
+  } finally {
+    await app.close()
+  }
+})

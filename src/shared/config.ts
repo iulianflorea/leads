@@ -22,3 +22,11 @@ export const DEFAULT_SEND_INTERVAL_SECONDS = 2
 export function isPlaceholderClientId(id: string): boolean {
   return /^0{8}-0{4}-0{4}-0{4}-0{12}$/.test(id)
 }
+
+/** An Entra application (client) ID is a GUID, e.g. 3f2a1b4c-5d6e-4f70-8a9b-0c1d2e3f4a5b. */
+export function isValidClientId(id: string): boolean {
+  return (
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id.trim()) &&
+    !isPlaceholderClientId(id.trim())
+  )
+}

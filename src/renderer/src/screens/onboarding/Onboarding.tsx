@@ -15,6 +15,7 @@ import { t, tp } from '@renderer/lib/i18n'
 import { cx } from '@renderer/lib/platform'
 import { useFocusTrap } from '@renderer/components/Modal'
 import { Button } from '@renderer/components/ui'
+import { ClientIdForm } from '../settings/ClientIdForm'
 
 const steps = [
   { title: 'onboarding.step1', text: 'onboarding.step1Text', icon: <UserRound size={16} /> },
@@ -53,9 +54,7 @@ function AccountStep({ next }: { next(): void }): ReactNode {
           {t('account.connectOutlook')}
         </Button>
       )}
-      {status?.provider === 'graph' && !status.configured && (
-        <p className="muted">{t('account.notConfiguredGraph')}</p>
-      )}
+      {status?.provider === 'graph' && !status.configured && <ClientIdForm compact />}
       <div className="onb-alt">
         <Button
           icon={<Server size={14} />}

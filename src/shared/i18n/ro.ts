@@ -419,8 +419,6 @@ export const ro = {
     methodMock: 'Mod demonstrativ',
     methodMockHint:
       'Nu se trimite nimic — emailurile sunt doar simulate. Util pentru a încerca aplicația.',
-    notConfiguredGraph:
-      'Conectarea Microsoft nu este încă configurată pentru această copie a aplicației. Urmează pașii din README (înregistrarea în Azure) sau folosește trimiterea prin SMTP.',
     smtpHint:
       'Pentru serverul de email al firmei sau Gmail cu parolă de aplicație. Atenție: emailurile trimise prin SMTP nu apar automat în „Trimise”.',
     smtpHost: 'Server',
@@ -437,6 +435,31 @@ export const ro = {
     smtpTest: 'Testează conexiunea',
     smtpOk: 'Conexiunea SMTP funcționează.',
     sidebarConnect: 'Conectează contul',
+    clientId: 'ID aplicație Microsoft (Client ID)',
+    clientIdHint:
+      'Îl găsești în Microsoft Entra, la aplicația înregistrată: „Application (client) ID”.',
+    clientIdPlaceholder: 'ex.: 3f2a1b4c-5d6e-4f70-8a9b-0c1d2e3f4a5b',
+    clientIdInvalid: 'ID-ul are forma xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx (litere a–f și cifre).',
+    clientIdSaved: 'ID-ul aplicației a fost salvat. Acum te poți conecta.',
+    clientIdRemoved: 'ID-ul aplicației a fost șters.',
+    clientIdNeeded: 'Ca să trimiți prin Outlook, introdu mai întâi ID-ul aplicației Microsoft.',
+    clientIdCurrent: 'ID aplicație: {id}',
+    clientIdChange: 'Schimbă ID-ul',
+    clientIdEnv:
+      'ID-ul este setat prin variabila de mediu LEADMAILER_MS_CLIENT_ID și nu poate fi schimbat de aici.',
+    clientIdBuild:
+      'Se folosește ID-ul inclus în această versiune a aplicației. Poți introduce altul mai jos.',
+    clientIdChangeWarning: 'Schimbarea ID-ului deconectează contul curent.',
+    clientIdHowTo: 'Cum obțin ID-ul?',
+    clientIdSteps1:
+      'Intră pe entra.microsoft.com → Applications → App registrations → New registration.',
+    clientIdSteps2:
+      'La „Supported account types” alege conturi din orice organizație și conturi Microsoft personale.',
+    clientIdSteps3:
+      'La „Redirect URI” alege „Public client/native (mobile & desktop)” cu valoarea http://localhost, apoi Register.',
+    clientIdSteps4:
+      'La „API permissions” adaugă permisiunile delegate Microsoft Graph: Mail.Send, Mail.ReadWrite, User.Read, offline_access.',
+    clientIdSteps5: 'Copiază „Application (client) ID” de pe pagina aplicației și lipește-l aici.',
     demoBadge: 'Demo',
   },
   send: {

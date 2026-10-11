@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { DEFAULT_SEND_INTERVAL_SECONDS } from '../config'
+import { DEFAULT_SEND_INTERVAL_SECONDS, isValidClientId } from '../config'
 
 export const themeSchema = z.enum(['system', 'light', 'dark'])
 export type Theme = z.infer<typeof themeSchema>
@@ -39,6 +39,11 @@ const settingsFields = {
   unsubscribeEnabled: z.boolean(),
   unsubscribeHtml: z.string().max(5_000),
   onboardingDone: z.boolean(),
+  /** Microsoft Entra application (client) ID entered in the app; empty = not set. */
+  msClientId: z
+    .string()
+    .trim()
+    .refine((v) => v === '' || isValidClientId(v), 'invalid client id'),
 }
 
 export const settingsSchema = z.object({
@@ -51,6 +56,7 @@ export const settingsSchema = z.object({
   unsubscribeEnabled: settingsFields.unsubscribeEnabled.default(false),
   unsubscribeHtml: settingsFields.unsubscribeHtml.default(DEFAULT_UNSUBSCRIBE_HTML),
   onboardingDone: settingsFields.onboardingDone.default(false),
+  msClientId: settingsFields.msClientId.default(''),
 })
 export type Settings = z.infer<typeof settingsSchema>
 
