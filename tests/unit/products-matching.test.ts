@@ -23,8 +23,14 @@ describe('ProductMatcher.match', () => {
   })
 
   it('matches values containing a product name, preferring the longest', () => {
-    expect(matcher.match('Panouri fotovoltaice 5kW')).toMatchObject({ productId: 2, kind: 'contains' })
-    expect(matcher.match('Pompă de căldură aer-apă 9 kW')).toMatchObject({ productId: 4, kind: 'contains' })
+    expect(matcher.match('Panouri fotovoltaice 5kW')).toMatchObject({
+      productId: 2,
+      kind: 'contains',
+    })
+    expect(matcher.match('Pompă de căldură aer-apă 9 kW')).toMatchObject({
+      productId: 4,
+      kind: 'contains',
+    })
   })
 
   it('matches small typos by similarity', () => {

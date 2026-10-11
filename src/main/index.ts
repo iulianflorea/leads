@@ -18,6 +18,9 @@ import { importHandlers } from './ipc/handlers/import'
 import { productHandlers } from './ipc/handlers/products'
 import { ProductsRepo } from './repos/products'
 import { ProductsService } from './services/products'
+import { TemplatesRepo } from './repos/templates'
+import { MessageBuilder } from './services/message'
+import { templateHandlers } from './ipc/handlers/templates'
 
 app.setName(APP_NAME)
 if (process.env.LEADMAILER_USER_DATA) app.setPath('userData', process.env.LEADMAILER_USER_DATA)
@@ -58,13 +61,30 @@ function createContext(): AppContext {
   const lists = new ListsRepo(db)
   const mappings = new MappingsRepo(db)
   const importer = new ImportService(db, leads, lists, mappings)
-  const products = new ProductsService(
-    new ProductsRepo(db, () => paths.pdfs),
+  const productsRepo = new ProductsRepo(db, () => paths.pdfs)
+  const products = new ProductsService(productsRepo, leads, () => paths.pdfs)
+  const templates = new TemplatesRepo(db)
+  const messages = new MessageBuilder(
+    db,
     leads,
+    productsRepo,
+    templates,
+    settings,
     () => paths.pdfs,
   )
   leads.purgeDeleted()
-  return { db, settings, leads, lists, mappings, importer, products }
+  return {
+    db,
+    settings,
+    leads,
+    lists,
+    mappings,
+    importer,
+    products,
+    productsRepo,
+    templates,
+    messages,
+  }
 }
 
 function bootstrap(): void {
@@ -77,6 +97,7 @@ function bootstrap(): void {
     ...leadHandlers(ctx),
     ...importHandlers(ctx),
     ...productHandlers(ctx),
+    ...templateHandlers(ctx),
   })
 
   createMainWindow()

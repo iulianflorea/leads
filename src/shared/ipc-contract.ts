@@ -29,6 +29,13 @@ import {
   type Product,
   type UnmatchedValue,
 } from './schemas/product'
+import {
+  previewInputSchema,
+  templateInputSchema,
+  templatePatchSchema,
+  type EmailPreview,
+  type Template,
+} from './schemas/template'
 
 /**
  * Typed IPC contract. Every channel declares a zod schema for its input
@@ -84,6 +91,15 @@ export const ipcContract = {
   'products:ignored': channel<IgnoredValue[]>()(none),
   'products:resolve': channel<void>()(resolveValueSchema),
   'products:unignore': channel<void>()(z.object({ valueNorm: z.string() })),
+
+  'templates:list': channel<Template[]>()(none),
+  'templates:create': channel<number>()(templateInputSchema),
+  'templates:update': channel<Template>()(idSchema.extend({ patch: templatePatchSchema })),
+  'templates:delete': channel<void>()(idSchema),
+  'templates:duplicate': channel<number>()(idSchema),
+  'templates:setDefault': channel<void>()(idSchema),
+  'templates:preview': channel<EmailPreview>()(previewInputSchema),
+  'templates:variables': channel<string[]>()(none),
 } as const
 
 export type IpcContract = typeof ipcContract

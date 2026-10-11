@@ -14,6 +14,7 @@ import { ComingSoon } from './ComingSoon'
 import { ImportScreen } from './import/ImportScreen'
 import { LeadsScreen } from './leads/LeadsScreen'
 import { ProductsScreen } from './products/ProductsScreen'
+import { TemplatesScreen } from './templates/TemplatesScreen'
 
 export interface ScreenDef {
   id: Screen
@@ -50,7 +51,7 @@ export const screens: ScreenDef[] = [
     id: 'templates',
     label: 'nav.templates',
     icon: <Mail size={16} />,
-    component: ComingSoon,
+    component: TemplatesScreen,
     shortcut: '4',
   },
   {

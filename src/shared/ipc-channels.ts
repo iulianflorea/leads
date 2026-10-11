@@ -38,6 +38,14 @@ export const channelNames = [
   'products:ignored',
   'products:resolve',
   'products:unignore',
+  'templates:list',
+  'templates:create',
+  'templates:update',
+  'templates:delete',
+  'templates:duplicate',
+  'templates:setDefault',
+  'templates:preview',
+  'templates:variables',
 ] as const satisfies readonly ChannelName[]
 
 export const eventNames = [
