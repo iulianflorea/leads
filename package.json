@@ -3,7 +3,7 @@
   "productName": "LeadMailer",
   "version": "0.1.0",
   "description": "Send personalized emails with product PDFs to leads imported from Excel.",
-  "main": "./out/main/index.js",
+  "main": "./out/main/index.cjs",
   "author": "LeadMailer",
   "license": "UNLICENSED",
   "private": true,

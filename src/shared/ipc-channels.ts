@@ -26,6 +26,18 @@ export const channelNames = [
   'import:validate',
   'import:commit',
   'import:close',
+  'products:list',
+  'products:create',
+  'products:update',
+  'products:delete',
+  'products:pickPdf',
+  'products:attachPdf',
+  'products:removePdf',
+  'products:openPdf',
+  'products:unmatched',
+  'products:ignored',
+  'products:resolve',
+  'products:unignore',
 ] as const satisfies readonly ChannelName[]
 
 export const eventNames = [

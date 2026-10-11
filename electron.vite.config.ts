@@ -11,6 +11,9 @@ export default defineConfig({
     build: {
       rollupOptions: {
         input: { index: resolve('src/main/index.ts') },
+        // CommonJS output: electron-vite's ESM "CommonJS shims" injection can land inside
+        // string literals that contain the word "import" (e.g. UI texts).
+        output: { format: 'cjs', entryFileNames: '[name].cjs' },
       },
     },
   },

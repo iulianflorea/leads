@@ -15,6 +15,9 @@ import type { AppContext } from './context'
 import { appHandlers } from './ipc/handlers/app'
 import { leadHandlers } from './ipc/handlers/leads'
 import { importHandlers } from './ipc/handlers/import'
+import { productHandlers } from './ipc/handlers/products'
+import { ProductsRepo } from './repos/products'
+import { ProductsService } from './services/products'
 
 app.setName(APP_NAME)
 if (process.env.LEADMAILER_USER_DATA) app.setPath('userData', process.env.LEADMAILER_USER_DATA)
@@ -55,8 +58,13 @@ function createContext(): AppContext {
   const lists = new ListsRepo(db)
   const mappings = new MappingsRepo(db)
   const importer = new ImportService(db, leads, lists, mappings)
+  const products = new ProductsService(
+    new ProductsRepo(db, () => paths.pdfs),
+    leads,
+    () => paths.pdfs,
+  )
   leads.purgeDeleted()
-  return { db, settings, leads, lists, mappings, importer }
+  return { db, settings, leads, lists, mappings, importer, products }
 }
 
 function bootstrap(): void {
@@ -68,6 +76,7 @@ function bootstrap(): void {
     ...appHandlers(ctx),
     ...leadHandlers(ctx),
     ...importHandlers(ctx),
+    ...productHandlers(ctx),
   })
 
   createMainWindow()

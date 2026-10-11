@@ -13,6 +13,7 @@ import { SettingsScreen } from './SettingsScreen'
 import { ComingSoon } from './ComingSoon'
 import { ImportScreen } from './import/ImportScreen'
 import { LeadsScreen } from './leads/LeadsScreen'
+import { ProductsScreen } from './products/ProductsScreen'
 
 export interface ScreenDef {
   id: Screen
@@ -42,7 +43,7 @@ export const screens: ScreenDef[] = [
     id: 'products',
     label: 'nav.products',
     icon: <Package size={16} />,
-    component: ComingSoon,
+    component: ProductsScreen,
     shortcut: '3',
   },
   {

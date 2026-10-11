@@ -21,6 +21,14 @@ import {
   type ImportResult,
   type SheetPreview,
 } from './schemas/import'
+import {
+  productInputSchema,
+  productPatchSchema,
+  resolveValueSchema,
+  type IgnoredValue,
+  type Product,
+  type UnmatchedValue,
+} from './schemas/product'
 
 /**
  * Typed IPC contract. Every channel declares a zod schema for its input
@@ -63,6 +71,19 @@ export const ipcContract = {
   'import:validate': channel<ImportReport>()(importValidateSchema),
   'import:commit': channel<ImportResult>()(importCommitSchema),
   'import:close': channel<void>()(z.object({ token: z.string() })),
+
+  'products:list': channel<Product[]>()(none),
+  'products:create': channel<number>()(productInputSchema),
+  'products:update': channel<void>()(idSchema.extend({ patch: productPatchSchema })),
+  'products:delete': channel<void>()(idSchema),
+  'products:pickPdf': channel<boolean>()(idSchema),
+  'products:attachPdf': channel<void>()(idSchema.extend({ path: z.string().min(1) })),
+  'products:removePdf': channel<void>()(idSchema),
+  'products:openPdf': channel<void>()(idSchema),
+  'products:unmatched': channel<UnmatchedValue[]>()(none),
+  'products:ignored': channel<IgnoredValue[]>()(none),
+  'products:resolve': channel<void>()(resolveValueSchema),
+  'products:unignore': channel<void>()(z.object({ valueNorm: z.string() })),
 } as const
 
 export type IpcContract = typeof ipcContract

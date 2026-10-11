@@ -4,6 +4,7 @@ import { FileSpreadsheet, Plus, Search, Trash2, Users, X } from 'lucide-react'
 import { leadStatuses, type LeadStatus } from '@shared/schemas/lead'
 import { useLeads, defaultFilters } from '@renderer/stores/leads'
 import { useLists } from '@renderer/stores/lists'
+import { useProducts } from '@renderer/stores/products'
 import { useNav } from '@renderer/stores/nav'
 import { toast } from '@renderer/stores/toast'
 import { call } from '@renderer/lib/api'
@@ -90,6 +91,7 @@ export function LeadsScreen(): ReactNode {
     clearSelection,
   } = useLeads()
   const { lists, load: loadLists } = useLists()
+  const { products, load: loadProducts } = useProducts()
   const params = useNav((s) => s.params)
   const go = useNav((s) => s.go)
   const [search, setSearch] = useState(filters.search)
@@ -98,13 +100,14 @@ export function LeadsScreen(): ReactNode {
 
   useEffect(() => {
     void loadLists()
+    void loadProducts()
     const listId = typeof params.listId === 'number' ? params.listId : undefined
     if (listId !== undefined) {
       setSearch('')
       useLeads.setState({ filters: { ...defaultFilters, listId } })
     }
     void fetch()
-  }, [params, fetch, loadLists])
+  }, [params, fetch, loadLists, loadProducts])
 
   useEffect(() => {
     if (debounced !== useLeads.getState().filters.search) setFilters({ search: debounced })
@@ -208,6 +211,22 @@ export function LeadsScreen(): ReactNode {
             {leadStatuses.map((s) => (
               <option key={s} value={s}>
                 {t(`status.${s}`)}
+              </option>
+            ))}
+          </select>
+          <select
+            className="select"
+            aria-label={t('fields.product')}
+            value={filters.productId ?? ''}
+            onChange={(e) =>
+              setFilters({ productId: e.target.value === '' ? null : Number(e.target.value) })
+            }
+          >
+            <option value="">{t('leads.allProducts')}</option>
+            <option value="0">{t('leads.unmatchedProducts')}</option>
+            {products.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
               </option>
             ))}
           </select>
