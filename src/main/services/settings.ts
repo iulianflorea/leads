@@ -41,13 +41,3 @@ export class SettingsService {
     nativeTheme.themeSource = this.current.theme
   }
 }
-
-export class MemorySettingsStore implements SettingsStore {
-  private data: Partial<Settings> = {}
-  load(): Partial<Settings> {
-    return this.data
-  }
-  save(settings: Settings): void {
-    this.data = settings
-  }
-}

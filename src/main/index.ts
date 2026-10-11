@@ -4,7 +4,10 @@ import type { Platform } from '@shared/types'
 import { logger } from './logger'
 import { createMainWindow } from './window'
 import { broadcast, registerIpc } from './ipc/registry'
-import { MemorySettingsStore, SettingsService } from './services/settings'
+import { SettingsService } from './services/settings'
+import { openDatabase } from './db/connection'
+import { SqliteSettingsStore } from './repos/settings'
+import { paths } from './paths'
 
 app.setName(APP_NAME)
 if (process.env.LEADMAILER_USER_DATA) app.setPath('userData', process.env.LEADMAILER_USER_DATA)
@@ -41,7 +44,9 @@ function bootstrap(): void {
   logger.info(`[app] starting ${APP_NAME} ${app.getVersion()} on ${process.platform}`)
   buildMenu()
 
-  const settings = new SettingsService(new MemorySettingsStore())
+  const db = openDatabase(paths.db)
+  logger.info(`[db] schema version ${String(db.pragma('user_version', { simple: true }))}`)
+  const settings = new SettingsService(new SqliteSettingsStore(db))
 
   registerIpc({
     'app:getInfo': () => ({
