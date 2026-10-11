@@ -8,6 +8,10 @@ export default defineConfig({
   main: {
     plugins: [externalizeDepsPlugin()],
     resolve: { alias: shared },
+    // Lets CI inject the Microsoft Client ID from a secret at build time.
+    define: {
+      __BUILD_MS_CLIENT_ID__: JSON.stringify(process.env.LEADMAILER_MS_CLIENT_ID ?? ''),
+    },
     build: {
       rollupOptions: {
         input: { index: resolve('src/main/index.ts') },

@@ -4,7 +4,11 @@
   "version": "0.1.0",
   "description": "Send personalized emails with product PDFs to leads imported from Excel.",
   "main": "./out/main/index.cjs",
-  "author": "LeadMailer",
+  "author": {
+    "name": "LeadMailer",
+    "email": "support@leadmailer.local"
+  },
+  "homepage": "https://github.com/iulianflorea/leads",
   "license": "UNLICENSED",
   "private": true,
   "type": "module",
@@ -22,10 +26,12 @@
     "test:watch": "vitest",
     "test:e2e": "electron-vite build && playwright test",
     "postinstall": "electron-builder install-app-deps",
-    "dist": "electron-vite build && electron-builder",
-    "dist:win": "electron-vite build && electron-builder --win",
-    "dist:mac": "electron-vite build && electron-builder --mac",
-    "dist:linux": "electron-vite build && electron-builder --linux"
+    "dist": "electron-vite build && electron-builder --publish never",
+    "samples": "node scripts/generate-samples.mjs",
+    "icon": "electron scripts/render-icon.cjs",
+    "dist:win": "electron-vite build && electron-builder --win --publish never",
+    "dist:mac": "electron-vite build && electron-builder --mac --arm64 --publish never",
+    "dist:linux": "electron-vite build && electron-builder --linux --publish never"
   },
   "dependencies": {
     "@azure/msal-node": "^7.0.1",

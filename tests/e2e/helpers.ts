@@ -22,7 +22,8 @@ export async function launch(
   const fresh = !options.userData
   const userData = options.userData ?? mkdtempSync(join(tmpdir(), 'leadmailer-e2e-'))
   const app = await electron.launch({
-    args: [root],
+    // GitHub's Ubuntu runners restrict the Chromium sandbox (AppArmor user namespaces).
+    args: process.platform === 'linux' && process.env.CI ? [root, '--no-sandbox'] : [root],
     env: {
       ...process.env,
       LEADMAILER_USER_DATA: userData,

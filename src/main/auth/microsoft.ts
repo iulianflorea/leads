@@ -14,8 +14,12 @@ import { secureStore } from './secure-store'
 
 const SCOPES = [...MS_SCOPES]
 
+declare const __BUILD_MS_CLIENT_ID__: string
+
+/** Runtime env var > ID injected at build time > constant in shared/config.ts. */
 export function microsoftClientId(): string {
-  return process.env.LEADMAILER_MS_CLIENT_ID?.trim() || MS_CLIENT_ID
+  const buildTime = typeof __BUILD_MS_CLIENT_ID__ === 'string' ? __BUILD_MS_CLIENT_ID__ : ''
+  return process.env.LEADMAILER_MS_CLIENT_ID?.trim() || buildTime.trim() || MS_CLIENT_ID
 }
 
 function page(title: string, message: string): string {
