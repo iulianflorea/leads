@@ -19,8 +19,8 @@ jobs:
     name: Lint, types and tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
@@ -58,8 +58,8 @@ jobs:
             args: --mac --arm64
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
@@ -71,7 +71,14 @@ jobs:
         env:
           LEADMAILER_MS_CLIENT_ID: ${{ secrets.MS_CLIENT_ID }}
       - name: Package
-        run: npx electron-builder ${{ matrix.args }} --publish never
+        shell: bash
+        run: |
+          # Missing secrets arrive as empty strings; electron-builder would then resolve
+          # CSC_LINK="" to the working directory ("not a file"). Drop empty ones.
+          for name in CSC_LINK CSC_KEY_PASSWORD WIN_CSC_LINK WIN_CSC_KEY_PASSWORD; do
+            if [ -z "${!name}" ]; then unset "$name"; fi
+          done
+          npx electron-builder ${{ matrix.args }} --publish never
         env:
           # Optional signing; packaging works unsigned when these secrets are absent.
           CSC_LINK: ${{ secrets.CSC_LINK }}
