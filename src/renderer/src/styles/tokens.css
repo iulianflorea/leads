@@ -1,0 +1,107 @@
+/*
+ * Design tokens. Light is the default; dark applies when <html data-theme="dark">.
+ * The preload script sets the attribute synchronously from nativeTheme before the
+ * first paint (no flash) and keeps it in sync with system / manual theme changes.
+ */
+:root {
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro', 'Segoe UI Variable', 'Segoe UI',
+    'Inter Variable', Inter, system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace;
+
+  --fs-xs: 11px;
+  --fs-sm: 12px;
+  --fs-md: 13px;
+  --fs-lg: 15px;
+  --fs-xl: 20px;
+  --fs-2xl: 26px;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  --titlebar-h: 44px;
+  --sidebar-w: 224px;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 120ms;
+  --dur-med: 220ms;
+
+  /* Light palette */
+  --bg: #f5f5f7;
+  --bg-sidebar: rgba(240, 240, 243, 0.92);
+  --surface: #ffffff;
+  --surface-2: #f9f9fb;
+  --surface-hover: rgba(0, 0, 0, 0.04);
+  --surface-active: rgba(0, 0, 0, 0.07);
+  --text: #1d1d1f;
+  --text-2: #5e5e63;
+  --text-3: #8e8e93;
+  --border: rgba(0, 0, 0, 0.09);
+  --border-strong: rgba(0, 0, 0, 0.16);
+  --accent: #0071e3;
+  --accent-hover: #0063c7;
+  --accent-soft: rgba(0, 113, 227, 0.1);
+  --on-accent: #ffffff;
+  --danger: #d70015;
+  --danger-soft: rgba(215, 0, 21, 0.09);
+  --success: #1f8a3b;
+  --success-soft: rgba(52, 199, 89, 0.14);
+  --warning: #b25000;
+  --warning-soft: rgba(255, 159, 10, 0.15);
+  --focus-ring: 0 0 0 3px rgba(0, 113, 227, 0.35);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06), 0 0 0 0.5px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08), 0 0 0 0.5px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.18), 0 0 0 0.5px rgba(0, 0, 0, 0.08);
+  --overlay: rgba(0, 0, 0, 0.25);
+  --skeleton: rgba(0, 0, 0, 0.06);
+
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --bg: #1e1e20;
+  --bg-sidebar: rgba(36, 36, 40, 0.92);
+  --surface: #262628;
+  --surface-2: #2c2c2f;
+  --surface-hover: rgba(255, 255, 255, 0.06);
+  --surface-active: rgba(255, 255, 255, 0.1);
+  --text: #f5f5f7;
+  --text-2: #b4b4ba;
+  --text-3: #85858c;
+  --border: rgba(255, 255, 255, 0.09);
+  --border-strong: rgba(255, 255, 255, 0.18);
+  --accent: #2f8cff;
+  --accent-hover: #4b9cff;
+  --accent-soft: rgba(47, 140, 255, 0.16);
+  --danger: #ff6961;
+  --danger-soft: rgba(255, 105, 97, 0.14);
+  --success: #4cd964;
+  --success-soft: rgba(76, 217, 100, 0.14);
+  --warning: #ffb340;
+  --warning-soft: rgba(255, 179, 64, 0.15);
+  --focus-ring: 0 0 0 3px rgba(47, 140, 255, 0.45);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4), 0 0 0 0.5px rgba(255, 255, 255, 0.06);
+  --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.45), 0 0 0 0.5px rgba(255, 255, 255, 0.08);
+  --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 0 0.5px rgba(255, 255, 255, 0.1);
+  --overlay: rgba(0, 0, 0, 0.5);
+  --skeleton: rgba(255, 255, 255, 0.07);
+  color-scheme: dark;
+}
+
+/* macOS: the native vibrancy shows through a lightly tinted sidebar. */
+:root[data-platform='darwin'] {
+  --bg-sidebar: rgba(246, 246, 248, 0.5);
+}
+:root[data-platform='darwin'][data-theme='dark'] {
+  --bg-sidebar: rgba(32, 32, 35, 0.55);
+}
