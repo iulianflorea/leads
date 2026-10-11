@@ -15,6 +15,8 @@ export interface SettingsStore {
 export class SettingsService {
   private current: Settings
 
+  private readonly listeners = new Set<(s: Settings) => void>()
+
   constructor(private readonly store: SettingsStore) {
     const parsed = settingsSchema.safeParse({ ...defaultSettings, ...store.load() })
     this.current = parsed.success ? parsed.data : defaultSettings
@@ -34,7 +36,13 @@ export class SettingsService {
     this.current = next
     this.store.save(next)
     this.applySideEffects()
+    for (const listener of this.listeners) listener(next)
     return next
+  }
+
+  onChange(listener: (settings: Settings) => void): () => void {
+    this.listeners.add(listener)
+    return () => this.listeners.delete(listener)
   }
 
   private applySideEffects(): void {

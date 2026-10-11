@@ -1,4 +1,4 @@
-import { type ReactNode } from 'react'
+import { type ReactNode, useEffect } from 'react'
 import { FolderOpen } from 'lucide-react'
 import type { Theme } from '@shared/schemas/settings'
 import { languages } from '@shared/i18n'
@@ -6,9 +6,19 @@ import { useSettings } from '@renderer/stores/settings'
 import { call } from '@renderer/lib/api'
 import { t } from '@renderer/lib/i18n'
 import { Button, Segmented, SkeletonRows } from '@renderer/components/ui'
+import { useNav } from '@renderer/stores/nav'
+import { AccountSection } from './AccountSection'
 
 export function SettingsScreen(): ReactNode {
   const { settings, info, update } = useSettings()
+  const section = useNav((s) => s.params.section)
+  useEffect(() => {
+    if (typeof section === 'string') {
+      document
+        .getElementById(`settings-${section}`)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }, [section, settings])
   if (!settings || !info)
     return (
       <div className="screen">
@@ -20,6 +30,8 @@ export function SettingsScreen(): ReactNode {
     <div className="screen">
       <div style={{ maxWidth: 720 }}>
         <p className="page-intro">{t('settings.subtitle')}</p>
+
+        <AccountSection />
 
         <h2 className="group-title">{t('settings.appearance')}</h2>
         <div className="group">

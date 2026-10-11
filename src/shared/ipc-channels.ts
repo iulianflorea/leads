@@ -46,11 +46,21 @@ export const channelNames = [
   'templates:setDefault',
   'templates:preview',
   'templates:variables',
+  'account:status',
+  'account:login',
+  'account:logout',
+  'account:setSmtpPassword',
+  'account:testSmtp',
+  'send:checks',
+  'send:single',
+  'send:test',
+  'leads:history',
 ] as const satisfies readonly ChannelName[]
 
 export const eventNames = [
   'settings:changed',
   'data:changed',
+  'account:changed',
 ] as const satisfies readonly EventName[]
 
 type Missing<A, B> = Exclude<A, B>

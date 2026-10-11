@@ -1,6 +1,6 @@
 import { type ReactNode, useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Ban, FileCheck2, FileQuestion, FileX2, X } from 'lucide-react'
+import { Ban, FileCheck2, FileQuestion, FileX2, Send, X } from 'lucide-react'
 import { leadStatuses, type LeadDetail, type LeadStatus } from '@shared/schemas/lead'
 import { call, subscribe } from '@renderer/lib/api'
 import { useLeads } from '@renderer/stores/leads'
@@ -9,6 +9,10 @@ import { t } from '@renderer/lib/i18n'
 import { Badge, Button, SkeletonRows } from '@renderer/components/ui'
 import { LeadForm, leadFormErrors, type LeadFormValue } from './LeadForm'
 import { StatusBadge } from './badges'
+import type { SendRecord } from '@shared/schemas/send'
+import { useSendDialog } from '../send/SendDialog'
+import { formatDateTime } from '@renderer/lib/format'
+import type { MessageKey } from '@renderer/lib/i18n'
 
 function toForm(d: LeadDetail): LeadFormValue {
   return {
@@ -22,17 +26,48 @@ function toForm(d: LeadDetail): LeadFormValue {
   }
 }
 
-export function LeadPanel({
-  id,
-  footer,
-}: {
-  id: number
-  footer?: (lead: LeadDetail) => ReactNode
-}): ReactNode {
+function SendHistory({ items }: { items: SendRecord[] }): ReactNode {
+  if (items.length === 0) return <p className="subtle">{t('leads.historyEmpty')}</p>
+  return (
+    <ul className="history-list">
+      {items.map((h) => (
+        <li key={h.id}>
+          <div className="row-between">
+            <strong className="truncate">{h.subject}</strong>
+            <SendStatusBadge status={h.status} />
+          </div>
+          <div className="subtle">
+            {formatDateTime(h.sentAt ?? h.createdAt)} · {h.templateName || '—'}
+            {h.attachments.length > 0 && ` · ${h.attachments.map((a) => a.name).join(', ')}`}
+          </div>
+          {h.status === 'failed' && h.errorCode && (
+            <div className="subtle text-danger">{t(`errors.${h.errorCode}` as MessageKey)}</div>
+          )}
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+export function SendStatusBadge({ status }: { status: SendRecord['status'] }): ReactNode {
+  const tone =
+    status === 'sent'
+      ? 'success'
+      : status === 'failed'
+        ? 'danger'
+        : status === 'unknown'
+          ? 'warning'
+          : 'accent'
+  return <Badge tone={tone}>{t(`sendStatus.${status}` as MessageKey)}</Badge>
+}
+
+export function LeadPanel({ id }: { id: number }): ReactNode {
   const close = (): void => useLeads.getState().open(null)
   const [lead, setLead] = useState<LeadDetail | null>(null)
   const [form, setForm] = useState<LeadFormValue | null>(null)
   const [saving, setSaving] = useState(false)
+  const [history, setHistory] = useState<SendRecord[]>([])
+  const openSend = useSendDialog((s) => s.open)
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -44,6 +79,8 @@ export function LeadPanel({
           setLead(d)
           setForm(toForm(d))
         })
+        .then(() => call('leads:history', { id }))
+        .then((h) => !cancelled && h && setHistory(h))
         .catch((error: unknown) => {
           if (!cancelled) {
             toast.error(error)
@@ -123,7 +160,15 @@ export function LeadPanel({
           <SkeletonRows rows={8} />
         ) : (
           <div className="stack" style={{ gap: 20 }}>
-            {footer?.(lead)}
+            <Button
+              variant="primary"
+              icon={<Send size={14} />}
+              disabled={!lead.emailValid}
+              onClick={() => openSend(lead.id)}
+              data-testid="lead-send"
+            >
+              {t('send.sendEmail')}
+            </Button>
 
             <LeadForm value={form} onChange={setForm} />
             {dirty && (
@@ -195,6 +240,11 @@ export function LeadPanel({
                   ))}
                 </ul>
               )}
+            </section>
+
+            <section>
+              <h3 className="panel-title">{t('leads.historyTitle')}</h3>
+              <SendHistory items={history} />
             </section>
 
             {Object.keys(lead.extra).length > 0 && (

@@ -9,7 +9,7 @@ import {
 } from 'lucide-react'
 import type { Screen } from '@renderer/stores/nav'
 import type { MessageKey } from '@renderer/lib/i18n'
-import { SettingsScreen } from './SettingsScreen'
+import { SettingsScreen } from './settings/SettingsScreen'
 import { ComingSoon } from './ComingSoon'
 import { ImportScreen } from './import/ImportScreen'
 import { LeadsScreen } from './leads/LeadsScreen'

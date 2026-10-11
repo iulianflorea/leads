@@ -8,6 +8,9 @@ import type { ProductsService } from './services/products'
 import type { TemplatesRepo } from './repos/templates'
 import type { ProductsRepo } from './repos/products'
 import type { MessageBuilder } from './services/message'
+import type { MailService } from './mailer/service'
+import type { SendsRepo } from './repos/sends'
+import type { SendService } from './services/send'
 
 /** Services shared by IPC handlers. */
 export interface AppContext {
@@ -21,4 +24,7 @@ export interface AppContext {
   productsRepo: ProductsRepo
   templates: TemplatesRepo
   messages: MessageBuilder
+  mail: MailService
+  sends: SendsRepo
+  sender: SendService
 }

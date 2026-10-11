@@ -41,6 +41,14 @@ export const useToasts = create<ToastState>((set, get) => ({
   },
 }))
 
+type ErrorActionResolver = (code: ReturnType<typeof errorCode>) => ToastAction | undefined
+let resolveErrorAction: ErrorActionResolver = () => undefined
+
+/** Lets the app attach a suggested action (e.g. "Reconnect") to error toasts by code. */
+export function setErrorActionResolver(resolver: ErrorActionResolver): void {
+  resolveErrorAction = resolver
+}
+
 export const toast = {
   success: (title: string, description?: string, action?: ToastAction) =>
     useToasts.getState().push({ kind: 'success', title, description, action }),
@@ -54,7 +62,7 @@ export const toast = {
       kind: 'error',
       title: t('errors.title'),
       description: t(`errors.${errorCode(error)}` as MessageKey),
-      action,
+      action: action ?? resolveErrorAction(errorCode(error)),
       duration: 8000,
     }),
 }

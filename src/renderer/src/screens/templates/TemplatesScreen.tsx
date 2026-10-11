@@ -1,5 +1,5 @@
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Copy, Mail, PenLine, Plus, Star, Trash2 } from 'lucide-react'
+import { Copy, Mail, PenLine, Plus, Send, Star, Trash2 } from 'lucide-react'
 import type { Template } from '@shared/schemas/template'
 import { useTemplates } from '@renderer/stores/templates'
 import { useSettings } from '@renderer/stores/settings'
@@ -54,6 +54,36 @@ function SaveIndicator({ state }: { state: SaveState }): ReactNode {
   )
 }
 
+function SendTestButton({ subject, bodyHtml }: { subject: string; bodyHtml: string }): ReactNode {
+  const previewLead = useTemplates((s) => s.previewLead)
+  const [sending, setSending] = useState(false)
+  const send = async (): Promise<void> => {
+    setSending(true)
+    try {
+      const email = await call('send:test', {
+        source: { draft: { subject, bodyHtml } },
+        leadId: previewLead?.id ?? null,
+      })
+      toast.success(t('templates.testSent', { email }))
+    } catch (error) {
+      toast.error(error)
+    } finally {
+      setSending(false)
+    }
+  }
+  return (
+    <Button
+      className="send-test"
+      icon={<Send size={14} />}
+      loading={sending}
+      onClick={() => void send()}
+      data-testid="send-test"
+    >
+      {t('templates.sendTest')}
+    </Button>
+  )
+}
+
 function TemplateEditor({ template }: { template: Template }): ReactNode {
   const { extras, replace } = useTemplates()
   const [draft, setDraft] = useState({
@@ -102,7 +132,10 @@ function TemplateEditor({ template }: { template: Template }): ReactNode {
           ariaLabel={t('templates.bodyPlaceholder')}
         />
       </div>
-      <PreviewPane source={{ draft: { subject: draft.subject, bodyHtml: draft.bodyHtml } }} />
+      <PreviewPane
+        source={{ draft: { subject: draft.subject, bodyHtml: draft.bodyHtml } }}
+        footer={<SendTestButton subject={draft.subject} bodyHtml={draft.bodyHtml} />}
+      />
     </>
   )
 }

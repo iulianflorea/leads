@@ -36,6 +36,14 @@ import {
   type EmailPreview,
   type Template,
 } from './schemas/template'
+import type { AccountStatus } from './schemas/mail'
+import {
+  sendSingleSchema,
+  sendTestSchema,
+  type LeadSendChecks,
+  type SendOutcome,
+  type SendRecord,
+} from './schemas/send'
 
 /**
  * Typed IPC contract. Every channel declares a zod schema for its input
@@ -100,6 +108,19 @@ export const ipcContract = {
   'templates:setDefault': channel<void>()(idSchema),
   'templates:preview': channel<EmailPreview>()(previewInputSchema),
   'templates:variables': channel<string[]>()(none),
+
+  'account:status': channel<AccountStatus>()(none),
+  'account:login': channel<AccountStatus>()(none),
+  'account:logout': channel<AccountStatus>()(none),
+  'account:setSmtpPassword': channel<void>()(
+    z.object({ password: z.string().max(1000).nullable() }),
+  ),
+  'account:testSmtp': channel<void>()(none),
+
+  'send:checks': channel<LeadSendChecks>()(sendSingleSchema),
+  'send:single': channel<SendOutcome>()(sendSingleSchema),
+  'send:test': channel<string>()(sendTestSchema),
+  'leads:history': channel<SendRecord[]>()(idSchema),
 } as const
 
 export type IpcContract = typeof ipcContract
@@ -114,5 +135,6 @@ export interface IpcEvents {
   'settings:changed': Settings
   /** Leads, lists or product matches changed; views should refetch. */
   'data:changed': { scope: Array<'leads' | 'lists' | 'products' | 'templates' | 'sends'> }
+  'account:changed': AccountStatus
 }
 export type EventName = keyof IpcEvents

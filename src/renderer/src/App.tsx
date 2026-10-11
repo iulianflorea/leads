@@ -3,11 +3,14 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Search } from 'lucide-react'
 import { useNav } from './stores/nav'
 import { useSettings } from './stores/settings'
+import { useAccount } from './stores/account'
+import { setErrorActionResolver } from './stores/toast'
 import { screenDef, screens } from './screens/registry'
 import { Sidebar } from './components/Sidebar'
 import { Toaster } from './components/Toaster'
 import { ConfirmHost } from './components/Confirm'
 import { CommandPalette } from './components/CommandPalette'
+import { SendDialogHost } from './screens/send/SendDialog'
 import { Button, Kbd } from './components/ui'
 import { isModEvent, modKey } from './lib/platform'
 import { t } from './lib/i18n'
@@ -43,6 +46,19 @@ function useGlobalShortcuts(): void {
   }, [go, setPaletteOpen])
 }
 
+setErrorActionResolver((code) => {
+  if (code === 'authExpired' || code === 'authRequired') {
+    return { label: t('actions.reconnect'), run: () => void useAccount.getState().login() }
+  }
+  if (code === 'authNotConfigured' || code.startsWith('smtp')) {
+    return {
+      label: t('actions.openSettings'),
+      run: () => useNav.getState().go('settings', { section: 'account' }),
+    }
+  }
+  return undefined
+})
+
 export function App(): ReactNode {
   const screen = useNav((s) => s.screen)
   const setPaletteOpen = useNav((s) => s.setPaletteOpen)
@@ -51,6 +67,7 @@ export function App(): ReactNode {
 
   useEffect(() => {
     void load()
+    void useAccount.getState().load()
   }, [load])
 
   const def = screenDef(screen)
@@ -87,6 +104,7 @@ export function App(): ReactNode {
         </AnimatePresence>
       </main>
       <CommandPalette />
+      <SendDialogHost />
       <ConfirmHost />
       <Toaster />
     </div>

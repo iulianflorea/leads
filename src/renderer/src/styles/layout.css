@@ -196,3 +196,46 @@
 .tabular {
   font-variant-numeric: tabular-nums;
 }
+
+.account-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--surface-hover);
+  text-align: left;
+  transition: background var(--dur-fast);
+}
+.account-chip:hover {
+  background: var(--surface-active);
+}
+.account-chip-empty {
+  color: var(--accent);
+  font-weight: 550;
+  justify-content: center;
+  border: 1px dashed var(--accent);
+  background: var(--accent-soft);
+}
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  background: linear-gradient(145deg, #5ac8fa, #007aff);
+  color: #fff;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+}
+.account-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+  line-height: 1.25;
+  font-size: var(--fs-sm);
+}

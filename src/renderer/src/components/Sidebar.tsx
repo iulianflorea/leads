@@ -4,6 +4,7 @@ import { APP_NAME } from '@shared/config'
 import { useNav } from '@renderer/stores/nav'
 import { screens } from '@renderer/screens/registry'
 import { t } from '@renderer/lib/i18n'
+import { AccountChip } from './AccountChip'
 
 export function Sidebar({ footer }: { footer?: ReactNode }): ReactNode {
   const { screen, go } = useNav()
@@ -36,6 +37,7 @@ export function Sidebar({ footer }: { footer?: ReactNode }): ReactNode {
       <div className="sidebar-spacer" />
       <div className="sidebar-footer">
         {footer}
+        <AccountChip />
         <button
           type="button"
           className="nav-item"
